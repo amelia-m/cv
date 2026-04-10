@@ -1,0 +1,35 @@
+# Source files — not tracked in repo
+drafts/
+linkedin/
+SESSION_SUMMARY.md
+
+# Rendered output — tag releases manually with PDF attached
+output/
+*.pdf
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.blg
+*.bbl
+
+# Quarto / R build artifacts
+_freeze/
+.quarto/
+*_files/
+*_cache/
+
+# R session artifacts
+.Rhistory
+.RData
+.Rproj.user/
+.Rproj.user
+
+# OS artifacts
+.DS_Store
+Thumbs.db

@@ -1,0 +1,235 @@
+---
+name: Amelia A.
+surname: Miramonti
+position: "Postdoctoral Researcher and Adjunct Faculty"
+address: "Nebraska Evaluation and Research Center · University of Nebraska–Lincoln"
+email: "amiramonti@nebraska.edu"
+github: "amelia-m"
+linkedin: "amelia-miramonti"
+orcid: "0000-0002-0277-4064"
+headcolor: "009ACD"
+date: "`r format(Sys.time(), '%B %Y')`"
+output: vitae::awesomecv
+engine: knitr
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+library(vitae)
+library(tibble)
+library(dplyr)
+library(purrr)
+library(glue)
+library(conflicted)
+
+conflicts_prefer(dplyr::filter, dplyr::select, .quiet = TRUE)
+
+source("cv_data.R")
+```
+
+# Education
+
+```{r education}
+education_data |>
+  detailed_entries(
+    what  = degree,
+    when  = dates,
+    with  = institution,
+    where = location,
+    why   = details
+  )
+```
+
+# Academic Professional Experience
+
+```{r positions}
+positions_data |>
+  detailed_entries(
+    what  = title,
+    when  = dates,
+    with  = unit,
+    where = institution,
+    why   = description
+  )
+```
+
+# Invited & Guest Lectures
+
+```{r lectures}
+lectures_data |>
+  brief_entries(
+    what  = title,
+    when  = date,
+    with  = context
+  )
+```
+
+# Refereed Journal Articles
+
+*Citations: 1,559 | h-index: 17 | i10-index: 20 — as of 2025-04-28*
+*(via Google Scholar)*
+
+## Published
+
+```{r publications}
+bibliography_entries("publications.bib") |>
+  arrange(desc(issued)) |>
+  mutate(
+    author = map(author, \(x) {
+      x$family <- if_else(x$family == "Miramonti", "\\textbf{Miramonti}", x$family)
+      x
+    })
+  )
+```
+
+## Manuscripts in Progress
+
+```{r manuscripts}
+manuscripts_data |>
+  brief_entries(
+    what = title,
+    when = status,
+    with = authors
+  )
+```
+
+## Preprints
+
+```{r preprints}
+# ⚠️ Confirm authorship and section placement before v1.0.0
+preprints_data |>
+  brief_entries(
+    what = glue("{title}. {repository}. doi:{doi}"),
+    when = date,
+    with = authors
+  )
+```
+
+# Papers Presented at Professional Meetings
+
+```{r presentations}
+bibliography_entries("presentations.bib") |>
+  arrange(desc(issued))
+```
+
+# Mentoring Experience
+
+```{r mentoring}
+mentoring_data |>
+  brief_entries(
+    what  = role,
+    when  = dates,
+    with  = glue("{program}, {institution}")
+  )
+```
+
+# Additional Professional Training
+
+## Nebraska Academy for Methodology, Analytics, & Psychometrics — Nebraska Methodology Applications
+
+```{r training-mapapps}
+training_data |>
+  filter(series == "Nebraska MAP Apps") |>
+  brief_entries(
+    what = title,
+    when = date,
+    with = presenter
+  )
+```
+
+## Nebraska Academy for Methodology, Analytics, & Psychometrics — Emerging Scholars Series
+
+```{r training-emerging}
+training_data |>
+  filter(series == "Emerging Scholars") |>
+  brief_entries(
+    what = title,
+    when = date,
+    with = presenter
+  )
+```
+
+# Professional Service
+
+```{r service}
+service_data |>
+  brief_entries(
+    what  = role,
+    when  = dates,
+    with  = organization
+  )
+```
+
+# Professional Associations
+
+```{r associations}
+associations_data |>
+  brief_entries(
+    what  = organization,
+    when  = dates,
+    with  = membership
+  )
+```
+
+# Professional Credentials
+
+```{r credentials}
+credentials_data |>
+  brief_entries(
+    what  = credential,
+    when  = status,
+    with  = organization
+  )
+```
+
+# Awards, Fellowships, & Scholarships
+
+```{r awards}
+awards_data |>
+  brief_entries(
+    what  = award,
+    when  = dates,
+    with  = organization
+  )
+```
+
+# Technical Skills
+
+## Laboratory Assessments
+
+```{r lab-skills, results="asis"}
+cat(paste0("\\begin{itemize}\n",
+           paste0("  \\item ", lab_skills, collapse = "\n"),
+           "\n\\end{itemize}"))
+```
+
+## Software & Computing
+
+```{r software}
+software_data |>
+  brief_entries(
+    what = tools,
+    with = category
+  )
+```
+
+## Languages
+
+```{r languages}
+languages_data |>
+  brief_entries(
+    what  = language,
+    with  = proficiency
+  )
+```
+
+# Online Profiles
+
+```{r profiles}
+profiles_data |>
+  brief_entries(
+    what = platform,
+    with = url
+  )
+```
