@@ -33,3 +33,4 @@ _freeze/
 # OS artifacts
 .DS_Store
 Thumbs.db
+.claude/settings.local.json
