@@ -174,7 +174,7 @@ orcid_df <- parse_orcid_works(orcid_raw)
 # ── 5. Build the report ───────────────────────────────────────────────────────
 
 lines <- character(0)
-add   <- function(...) lines <<- c(lines, glue(...))
+add   <- function(...) lines <<- c(lines, glue(..., .envir = parent.frame()))
 hr    <- function(char = "─", width = 60) add(paste(rep(char, width), collapse = ""))
 
 hr("═")
