@@ -11,6 +11,7 @@ Reproducible, version-controlled CV built with [Quarto](https://quarto.org) and 
 | `publications.bib` | BibTeX — 31 peer-reviewed journal articles |
 | `presentations.bib` | BibTeX — ~53 conference presentations |
 | `render.R` | One-liner render script (see below) |
+| `update_bib.R` | Standalone script — fetches Scholar + ORCID, reports new/changed entries |
 | `Miramonti_CV_2026-03-04.md` | Authoritative plain-text CV — source of record for content edits |
 | `Miramonti_CV_review_notes.md` | Open items and change log |
 
@@ -22,7 +23,8 @@ Reproducible, version-controlled CV built with [Quarto](https://quarto.org) and 
 
 ```r
 install.packages(c("vitae", "tibble", "dplyr", "purrr", "glue",
-                   "conflicted", "RefManageR", "rmarkdown", "knitr"))
+                   "conflicted", "RefManageR", "rmarkdown", "knitr",
+                   "scholar", "rorcid", "stringr"))
 ```
 
 - **TinyTeX** (LaTeX for PDF rendering):
@@ -44,6 +46,59 @@ Output: `output/cv.pdf`
 > **Note:** Use `rmarkdown::render("cv.qmd")`, not `quarto render cv.qmd`.
 > The `vitae` package uses the R Markdown rendering pipeline;
 > the Quarto CLI does not support `vitae` output formats directly.
+
+## Checking for new publications (`update_bib.R`)
+
+Run periodically (e.g., before re-submitting a job application) to catch new
+publications or updated metadata:
+
+```r
+source("update_bib.R")
+```
+
+The script fetches your publication list from **Google Scholar** and **ORCID**,
+compares both against `publications.bib`, and prints a report covering:
+
+| Section | What it checks |
+|---------|---------------|
+| 1 | Papers on Scholar not found in bib (likely new publications) |
+| 2 | Year discrepancies between bib and Scholar |
+| 3 | ORCID works not matched in bib |
+| 4 | DOI enrichment — ORCID has a DOI that the bib entry is missing |
+| 5 | Bib entries missing volume / pages (and not flagged as online-first) |
+
+**The script never modifies `publications.bib`** — all updates are manual.
+To also save the report to a file:
+
+```r
+source("update_bib.R"); writeLines(report, "bib_review.txt")
+```
+
+> **Requires:** `scholar`, `rorcid`, `stringr` — install once with
+> `install.packages(c("scholar", "rorcid", "stringr"))`.
+
+## Known patch: vitae latexcv template (FontAwesome 5)
+
+The installed `vitae` latexcv template (`classic/main.tex`) ships with a mixed
+FontAwesome 4/5 setup that causes a LaTeX compile error for the `orcid`, `scholar`,
+and `researchgate` footer fields. The following manual patch was applied to the
+installed template file:
+
+**File:** `C:\Users\ameli\AppData\Local\R\win-library\4.5\vitae\rmarkdown\templates\latexcv\resources\classic\main.tex`
+
+**Changes:**
+- Line 106: `\usepackage{fontawesome}` → `\usepackage{fontawesome5}`
+- Lines 395–397: all `\faicon{...}` → `\faIcon{...}` (also updated `map-marker` → `map-marker-alt`)
+- Lines 441–446: remaining `\faicon{...}` → `\faIcon{...}`
+- Line 86: `bottom=-.6cm` → `bottom=2cm` (negative margin caused text to overflow and get clipped at page bottoms)
+
+> ⚠️ **This patch will be overwritten if `vitae` is reinstalled or updated.**
+> Re-apply the changes above if ORCID/Scholar/ResearchGate icons disappear from
+> the footer after a package update.
+>
+> A PR to fix this upstream in the vitae package is planned.
+
+---
 
 ## Versioning
 
