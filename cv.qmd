@@ -7,9 +7,14 @@ email: "amiramonti@nebraska.edu"
 github: "amelia-m"
 linkedin: "amelia-miramonti"
 orcid: "0000-0002-0277-4064"
+scholar: "AcbJlasAAAAJ"
+researchgate: "Amelia-Miramonti"
+www: "osf.io/zk8rv/"
 headcolor: "009ACD"
 date: "`r format(Sys.time(), '%B %Y')`"
-output: vitae::awesomecv
+output:
+  vitae::latexcv:
+    theme: classic
 engine: knitr
 ---
 
@@ -77,7 +82,9 @@ bibliography_entries("publications.bib") |>
   arrange(desc(issued)) |>
   mutate(
     author = map(author, \(x) {
-      x$family <- if_else(x$family == "Miramonti", "\\textbf{Miramonti}", x$family)
+      if (!is.null(x$family)) {
+        x$family <- replace(x$family, x$family == "Miramonti", "\\textbf{Miramonti}")
+      }
       x
     })
   )
