@@ -52,6 +52,7 @@ titles_match <- function(a, b, threshold = 0.70) {
 # Returns NA_character_ if no entry meets the threshold.
 find_bib_match <- function(query_title_norm, bib_titles_norm, keys,
                            threshold = 0.70) {
+  if (length(bib_titles_norm) == 0) return(NA_character_)
   scores <- map_dbl(bib_titles_norm, \(bt) {
     words_q <- str_split(query_title_norm, " ")[[1]]
     words_b <- str_split(bt, " ")[[1]]
@@ -64,29 +65,129 @@ find_bib_match <- function(query_title_norm, bib_titles_norm, keys,
   if (scores[best_idx] >= threshold) keys[best_idx] else NA_character_
 }
 
-# ── 1. Load existing bib ──────────────────────────────────────────────────────
+# Lightweight "is this title already known?" check against a pooled vector of
+# normalised titles from multiple sources (publications.bib, presentations.bib,
+# preprints_data, dissertation/thesis titles, bib_ignore extras, etc.).
+title_is_known <- function(query_norm, known_norms, threshold = 0.70) {
+  if (length(known_norms) == 0) return(FALSE)
+  words_q <- str_split(query_norm, " ")[[1]]
+  if (length(words_q) == 0) return(FALSE)
+  any(map_lgl(known_norms, \(k) {
+    words_k <- str_split(k, " ")[[1]]
+    if (length(words_k) == 0) return(FALSE)
+    overlap <- sum(words_q %in% words_k)
+    min_len <- min(length(words_q), length(words_k))
+    (overlap / min_len) >= threshold
+  }))
+}
+
+# Load a BibTeX file into a tidy tibble.  Returns NULL if the file is missing
+# or unparseable.  Used for both publications.bib and presentations.bib.
+load_bib_entries <- function(path) {
+  if (!file.exists(path)) return(NULL)
+  entries <- tryCatch(
+    suppressWarnings(RefManageR::ReadBib(path, check = FALSE)),
+    error = function(e) {
+      message("  ⚠  Failed to read ", path, ": ", conditionMessage(e))
+      NULL
+    }
+  )
+  if (is.null(entries) || length(entries) == 0) return(NULL)
+  map_dfr(names(entries), \(k) {
+    e <- entries[[k]]
+    tibble(
+      source  = path,
+      key     = k,
+      title   = as.character(e$title   %||% ""),
+      journal = as.character(e$journal %||% ""),
+      year    = as.character(e$year    %||% ""),
+      volume  = as.character(e$volume  %||% ""),
+      number  = as.character(e$number  %||% ""),
+      pages   = as.character(e$pages   %||% ""),
+      doi     = tolower(as.character(e$doi %||% "")),
+      note    = as.character(e$note    %||% "")
+    )
+  }) |>
+    mutate(title_norm = norm_title(title))
+}
+
+# ── 1. Load publications.bib (authoritative source for Sections 2, 4, 5) ────
 
 message("Reading ", .bib_file, " ...")
-bib <- RefManageR::ReadBib(.bib_file, check = FALSE)
-
-bib_df <- map_dfr(names(bib), \(k) {
-  e <- bib[[k]]
-  tibble(
-    key     = k,
-    title   = as.character(e$title   %||% ""),
-    journal = as.character(e$journal %||% ""),
-    year    = as.character(e$year    %||% ""),
-    volume  = as.character(e$volume  %||% ""),
-    number  = as.character(e$number  %||% ""),
-    pages   = as.character(e$pages   %||% ""),
-    doi     = tolower(as.character(e$doi %||% "")),
-    note    = as.character(e$note    %||% "")
-  )
-}) |>
-  mutate(title_norm = norm_title(title))
+bib_df <- load_bib_entries(.bib_file) |>
+  select(-source)   # keep the simple shape Sections 2/4/5 expect
 
 bib_keys        <- bib_df$key
 bib_titles_norm <- bib_df$title_norm
+
+# ── 1b. Load additional "known title" sources ────────────────────────────────
+#
+# Sections 1 and 3 ask "is this Scholar/ORCID entry already in the CV?"  That
+# question should include more than publications.bib — presentations, preprints,
+# dissertation/thesis titles, and a manual allowlist all count as "known".
+#
+# Everything loaded here feeds a pooled vector `known_titles_norm` (and, for
+# ORCID's DOI-first matching, `known_dois`).
+
+known_titles_norm <- bib_titles_norm
+known_dois        <- bib_df$doi[bib_df$doi != ""]
+
+# presentations.bib — conference abstracts, posters, invited talks
+pres_df <- load_bib_entries("presentations.bib")
+if (!is.null(pres_df)) {
+  message("Reading presentations.bib ... (", nrow(pres_df), " entries)")
+  known_titles_norm <- c(known_titles_norm, pres_df$title_norm)
+  known_dois        <- c(known_dois, pres_df$doi[pres_df$doi != ""])
+}
+
+# cv_data.R → preprints_data (and dissertation/thesis if present as columns)
+if (file.exists("cv_data.R")) {
+  .env <- new.env()
+  ok <- tryCatch({
+    suppressMessages(sys.source("cv_data.R", envir = .env))
+    TRUE
+  }, error = function(e) {
+    message("  ⚠  Could not source cv_data.R: ", conditionMessage(e))
+    FALSE
+  })
+  if (ok && exists("preprints_data", envir = .env)) {
+    pre_titles <- as.character(.env$preprints_data$title)
+    pre_dois   <- tolower(as.character(.env$preprints_data$doi %||% ""))
+    message("Reading cv_data.R::preprints_data ... (", length(pre_titles), " entries)")
+    known_titles_norm <- c(known_titles_norm, norm_title(pre_titles))
+    known_dois        <- c(known_dois, pre_dois[pre_dois != "" & !is.na(pre_dois)])
+  }
+}
+
+# bib_ignore.R — user-maintained allowlists (year discrepancies + extra titles)
+.ignore_year  <- list()
+.ignore_count <- 0L
+if (file.exists("bib_ignore.R")) {
+  .ig <- new.env()
+  ok <- tryCatch({
+    suppressMessages(sys.source("bib_ignore.R", envir = .ig))
+    TRUE
+  }, error = function(e) {
+    message("  ⚠  Could not source bib_ignore.R: ", conditionMessage(e))
+    FALSE
+  })
+  if (ok) {
+    if (exists("ignore_year_discrepancies", envir = .ig)) {
+      .ignore_year <- .ig$ignore_year_discrepancies
+    }
+    if (exists("extra_matched_titles", envir = .ig)) {
+      extras <- as.character(.ig$extra_matched_titles)
+      .ignore_count <- length(extras)
+      message("Reading bib_ignore.R ... (",
+              .ignore_count, " extra titles, ",
+              length(.ignore_year), " year allowlist entries)")
+      known_titles_norm <- c(known_titles_norm, norm_title(extras))
+    }
+  }
+}
+
+known_titles_norm <- unique(known_titles_norm[known_titles_norm != ""])
+known_dois        <- unique(known_dois)
 
 # ── 2. Fetch Google Scholar publications ──────────────────────────────────────
 
@@ -181,15 +282,17 @@ hr("═")
 add(" UPDATE_BIB REVIEW REPORT — {format(Sys.Date(), '%Y-%m-%d')}")
 hr("═")
 add("")
-add("  Bib file : {.bib_file}  ({nrow(bib_df)} entries)")
-add("  Scholar  : {if (!is.null(scholar_raw)) nrow(scholar_raw) else 'fetch failed'} publications")
-add("  ORCID    : {if (!is.null(orcid_df)) nrow(orcid_df) else 'fetch failed'} works")
+add("  Bib file     : {.bib_file}  ({nrow(bib_df)} entries)")
+add("  Cross-refs   : presentations.bib ({if (!is.null(pres_df)) nrow(pres_df) else 0}), cv_data.R::preprints_data, bib_ignore.R ({.ignore_count} extras)")
+add("  Known titles : {length(known_titles_norm)} pooled from all sources")
+add("  Scholar      : {if (!is.null(scholar_raw)) nrow(scholar_raw) else 'fetch failed'} publications")
+add("  ORCID        : {if (!is.null(orcid_df)) nrow(orcid_df) else 'fetch failed'} works")
 add("")
 
 # ── 5a. Scholar: unmatched entries ─────────────────────────────────────────
 
 hr()
-add(" SECTION 1 — Scholar publications not matched in bib")
+add(" SECTION 1 — Scholar publications not matched in any known source")
 hr()
 add("")
 
@@ -201,13 +304,13 @@ if (is.null(scholar_raw)) {
     as_tibble() |>
     mutate(title_norm = norm_title(title))
 
+  # Match against the pooled known-titles vector (publications.bib +
+  # presentations.bib + preprints_data + bib_ignore extras).
   scholar_unmatched <- scholar_df |>
-    filter(map_lgl(title_norm, \(t) {
-      is.na(find_bib_match(t, bib_titles_norm, bib_keys))
-    }))
+    filter(!map_lgl(title_norm, \(t) title_is_known(t, known_titles_norm)))
 
   if (nrow(scholar_unmatched) == 0) {
-    add("  ✓ All Scholar publications matched in bib.")
+    add("  ✓ All Scholar publications matched against a known source.")
     add("")
   } else {
     add("  {nrow(scholar_unmatched)} unmatched paper(s) — may be new publications:")
@@ -244,7 +347,8 @@ if (is.null(scholar_raw)) {
     filter(
       !is.na(scholar_year),
       !is.na(year),
-      year != scholar_year
+      year != scholar_year,
+      !key %in% names(.ignore_year)
     )
 
   if (nrow(year_issues) == 0) {
@@ -260,12 +364,22 @@ if (is.null(scholar_raw)) {
       add("")
     })
   }
+
+  # Echo any allowlisted year discrepancies as a reminder that they exist.
+  if (length(.ignore_year) > 0) {
+    add("  Suppressed via bib_ignore.R ({length(.ignore_year)} entry/entries):")
+    walk(names(.ignore_year), \(k) {
+      reason <- .ignore_year[[k]]
+      add("    • {k} — {reason}")
+    })
+    add("")
+  }
 }
 
 # ── 5c. ORCID: unmatched entries ─────────────────────────────────────────────
 
 hr()
-add(" SECTION 3 — ORCID works not matched in bib")
+add(" SECTION 3 — ORCID works not matched in any known source")
 hr()
 add("")
 
@@ -273,19 +387,19 @@ if (is.null(orcid_df)) {
   add("  (ORCID fetch failed or returned no works — skipping)")
   add("")
 } else {
-  # Match by DOI first, then title
+  # Match by DOI first (against pooled known_dois), then title
+  # (against pooled known_titles_norm).
   orcid_unmatched <- orcid_df |>
     filter(map_lgl(seq_len(n()), \(i) {
       row <- orcid_df[i, ]
 
-      # DOI match: check if any bib entry shares this DOI
+      # DOI match: any known source with this DOI?
       if (!is.na(row$doi) && row$doi != "") {
-        doi_hit <- any(bib_df$doi == row$doi, na.rm = TRUE)
-        if (doi_hit) return(FALSE)  # matched
+        if (row$doi %in% known_dois) return(FALSE)  # matched
       }
 
-      # Title match
-      is.na(find_bib_match(row$title_norm, bib_titles_norm, bib_keys))
+      # Title match against the pooled known-titles vector
+      !title_is_known(row$title_norm, known_titles_norm)
     }))
 
   if (nrow(orcid_unmatched) == 0) {

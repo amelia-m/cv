@@ -12,6 +12,8 @@ Reproducible, version-controlled CV built with [Quarto](https://quarto.org) and 
 | `presentations.bib` | BibTeX — ~53 conference presentations |
 | `render.R` | One-liner render script (see below) |
 | `update_bib.R` | Standalone script — fetches Scholar + ORCID, reports new/changed entries |
+| `bib_ignore.R` | Allowlists for `update_bib.R` (known-stale years, non-bib titles) |
+| `bib_review_notes.md` | Rolling log of bib reconciliation decisions |
 | `Miramonti_CV_2026-03-04.md` | Authoritative plain-text CV — source of record for content edits |
 | `Miramonti_CV_review_notes.md` | Open items and change log |
 
@@ -57,13 +59,20 @@ source("update_bib.R")
 ```
 
 The script fetches your publication list from **Google Scholar** and **ORCID**,
-compares both against `publications.bib`, and prints a report covering:
+and compares both against a pooled "known titles" vector built from:
+
+- `publications.bib` (authoritative for Sections 2, 4, 5)
+- `presentations.bib` (conference abstracts, posters, invited talks)
+- `cv_data.R` → `preprints_data` (preprints/working papers)
+- `bib_ignore.R` → `extra_matched_titles` (dissertations, theses, known parsing artifacts)
+
+It then prints a report covering:
 
 | Section | What it checks |
 |---------|---------------|
-| 1 | Papers on Scholar not found in bib (likely new publications) |
-| 2 | Year discrepancies between bib and Scholar |
-| 3 | ORCID works not matched in bib |
+| 1 | Scholar publications not matched against any known source |
+| 2 | Year discrepancies between bib and Scholar (excluding allowlist) |
+| 3 | ORCID works not matched against any known source |
 | 4 | DOI enrichment — ORCID has a DOI that the bib entry is missing |
 | 5 | Bib entries missing volume / pages (and not flagged as online-first) |
 
@@ -73,6 +82,27 @@ To also save the report to a file:
 ```r
 source("update_bib.R"); writeLines(report, "bib_review.txt")
 ```
+
+### Suppressing known false positives (`bib_ignore.R`)
+
+Some discrepancies are persistent but legitimate — e.g., Google Scholar reports
+an Epub-ahead-of-print year while `publications.bib` uses the final print year.
+To stop these from surfacing on every rerun, add them to `bib_ignore.R`:
+
+```r
+# Year-discrepancy allowlist (bib key → reason)
+ignore_year_discrepancies <- list(
+  lamonica2016critical = "Scholar shows Epub 2015; print is 2016 (PMID 26329841)"
+)
+
+# Titles to treat as "already in the CV" without a bib entry
+extra_matched_titles <- c(
+  "My dissertation title here",
+  "A Scholar parsing artifact title"
+)
+```
+
+The allowlist reasons are echoed at the bottom of Section 2 as a reminder.
 
 > **Requires:** `scholar`, `rorcid`, `stringr` — install once with
 > `install.packages(c("scholar", "rorcid", "stringr"))`.

@@ -2,11 +2,9 @@
 drafts/
 linkedin/
 SESSION_SUMMARY.md
-
 # Rendered output — tag releases manually with PDF attached
 output/
 *.pdf
-
 # LaTeX build artifacts
 *.aux
 *.log
@@ -17,20 +15,21 @@ output/
 *.synctex.gz
 *.blg
 *.bbl
-
 # Quarto / R build artifacts
 _freeze/
 .quarto/
 *_files/
 *_cache/
-
 # R session artifacts
 .Rhistory
 .RData
 .Rproj.user/
 .Rproj.user
-
 # OS artifacts
 .DS_Store
 Thumbs.db
 .claude/settings.local.json
+.httr-oauth
+# update_bib.R review output (ephemeral; findings go into bib_review_notes.md)
+bib_review.txt
+bib_review_*.txt
