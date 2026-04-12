@@ -22,7 +22,8 @@ These are publications Scholar lists but the bib did not.  After investigation,
 - `[6]` "Open Library of Bioscience" (Gold et al., NA) — aggregated citation record.
 - `[27]` "Institute of Exercise Physiology and Wellness, University of Central Florida, Orlando, USA" — affiliation string scraped as a title.
 
-**Already in `presentations.bib`**
+**Already in `presentations.bib`** (verified by the improved `update_bib.R`
+after it was extended to cross-reference `presentations.bib` — see update below)
 - `[3]` Pharmacokinetics of caffeine (JISSN 2014) → `gonzalez2014caffeine_abs`
 - `[4]` Test-retest reliability of 40-yd dash / vertical jump (ACSM 2017)
 - `[5]` Effects of speed and agility training on combine performance (ACSM 2017)
@@ -32,22 +33,27 @@ These are publications Scholar lists but the bib did not.  After investigation,
 - `[12]` Leukemia inhibitory factor response to resistance training (ACSM 2017)
 - `[13]` Power push-up tests from knees and toes (ACSM 2017)
 - `[14]` Physiological responses underlying perception of effort (ACSM 2016)
-- `[15]` PWCFT estimation in response to HIIT (ACSM 2016)
 - `[16]` Work-to-rest ratios on peak torque and neuromuscular responses (ACSM 2016)
 - `[17]` Varied intensity on torque and neuromuscular parameters (ACSM 2016)
 - `[18]` Cognitive function and handgrip in older adults (ACSM 2016)
 - `[19]` Voluntary activation: ITT vs MMG amplitude (ACSM 2016)
-- `[20]` Work-to-rest ratios and repeated sprint ability (ACSM 2015)
 - `[21]` Collegiate track divisions / distance-time relationship (ACSM 2015)
-- `[22]` High-intensity resistance training and upper-body muscle/bone (ACSM 2015)
 - `[23]` Critical power and heart rate deflection point (ACSM 2015)
-- `[24]` HMB + HIIT and muscle recruitment efficiency (ACSM 2015)
 - `[25]` Muscle morphology and neuromuscular economy (ACSM 2014)
 - `[26]` Anaerobic working capacity and critical power (ACSM 2014)
 
-> **To do before v1.0.0:** sweep `presentations.bib` and verify each of the
-> above is present with matching metadata.  `update_bib.R` only checks
-> `publications.bib`, so this reconciliation is still manual for presentations.
+**Added to `presentations.bib` on 2026-04-11** (these four were flagged as
+still unmatched after the script was upgraded to cross-reference presentations.
+The original notes on this page erroneously listed them as already present.)
+- `[15]` PWCFT estimation in response to HIIT (ACSM 2016 Boston) → `riffe2016pwcft`
+- `[20]` Work-to-rest ratios and repeated sprint ability (ACSM 2015 San Diego) → `lamonica2015workrest`
+- `[22]` High-intensity resistance training and upper-body muscle/bone (ACSM 2015 San Diego) → `church2015upperbody`
+- `[24]` HMB + HIIT and muscle recruitment efficiency (ACSM 2015 San Diego) → `robinson2015hmbhiit`
+
+> **TODO before v1.0.0:** the 4 newly-added entries carry partial author lists
+> sourced from Google Scholar (which truncates at ~6 names).  Confirm the full
+> author lists against the MSSE 2015 / 2016 abstract books and remove the
+> `Partial author list` note from each `note` field.
 
 **Already in `cv_data.R` / other sections**
 - `[2]` Reliability of the Woodway Curve non-motorized treadmill (JSSM 2013) —
@@ -58,10 +64,13 @@ These are publications Scholar lists but the bib did not.  After investigation,
 - `[10]` Evaluation of the Feasibility of a Two-Method Measurement Design (2018)
   → Master's thesis; listed in `cv_data.R` under Education.
 
-**Design improvement flagged for `update_bib.R`:**
-Script only checks `publications.bib`.  To eliminate the bulk of these false
-positives it should also ingest `presentations.bib` and the dissertation/thesis
-titles from `cv_data.R` before flagging anything as "unmatched."
+**Design improvement flagged for `update_bib.R`:** ✅ **Completed 2026-04-11.**
+Script now cross-references `presentations.bib`, `cv_data.R::preprints_data`,
+and a manual allowlist (`bib_ignore.R::extra_matched_titles`) before flagging
+Scholar/ORCID entries as unmatched.  Rerunning after the upgrade dropped
+Section 1 from 27 → 4, and the 4 remaining items exposed a real gap in
+`presentations.bib` that was then filled (see "Added to `presentations.bib`"
+block above).
 
 ### Section 2 — Year discrepancies (bib vs Scholar)
 
@@ -108,10 +117,19 @@ attention:
 
 ## Open items carried forward
 
-- [ ] Sweep `presentations.bib` for the 20 ACSM/JAND/CDN conference abstracts
-      listed in Section 1 above — confirm all are present with matching metadata.
-- [ ] Extend `update_bib.R` to also cross-reference `presentations.bib` and
+- [x] ~~Sweep `presentations.bib` for the 20 ACSM/JAND/CDN conference abstracts
+      listed in Section 1 — confirm all are present with matching metadata.~~
+      Completed via the `update_bib.R` upgrade; 17 were already present, 4
+      were missing and have been added.
+- [x] ~~Extend `update_bib.R` to also cross-reference `presentations.bib` and
       `cv_data.R` (dissertation/preprints) so unmatched-Scholar reports are
-      more actionable.
-- [ ] Rerun `update_bib.R` post-changes to confirm zero outstanding issues in
-      Sections 2–5.
+      more actionable.~~  Completed 2026-04-11 (commit a94bcd3).
+- [x] ~~Rerun `update_bib.R` post-changes to confirm zero outstanding issues
+      in Sections 2–5.~~  Confirmed — Sections 2/3/4/5 all clean after the
+      reconciliation pass.
+- [ ] Confirm full author lists for the 4 newly-added ACSM abstracts
+      (`riffe2016pwcft`, `lamonica2015workrest`, `church2015upperbody`,
+      `robinson2015hmbhiit`) against the MSSE abstract books, then remove
+      the `Partial author list` caveat from each entry's `note` field.
+- [ ] Consider adding DOIs for presentation entries where MSSE-supplement
+      DOIs are available (low-priority enrichment).
