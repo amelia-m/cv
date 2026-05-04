@@ -91,7 +91,7 @@ Meeting the Demands of High Intensity Interval Training: Metabolic and Physiolog
 
 ## Refereed Journal Articles
 
-*Citations: 1,559 | h-index: 17 | i10-index: 20 — as of 2025-04-28*
+*Citations: 1,727 | h-index: 18 | i10-index: 20 — as of 2026-04-11*
 *(via Google Scholar: Amelia A. Miramonti)*
 
 ### Published

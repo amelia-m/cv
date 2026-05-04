@@ -20,11 +20,15 @@ This appears to be an OSF preprint. The Wick K et al. APA 2024 presentation ("Fa
 
 ### 8. 📝 Software Section — Review Before Finalizing
 
-The following items were in the Draft but removed from the Clean version, and have been restored. Confirm which to keep and at what proficiency level:
-- GitHub / Git
-- Python
-- tidyverse (as part of R)
-- Unix / Bash
+**2026-04-11 update:** Major overhaul completed — expanded from 5 to 9 categories,
+added ~25 tools. Remaining items to revisit:
+
+- **Proficiency levels** — deferred; may add later as a column or inline annotation
+- **Python** — listed under "Programming & Version Control"; **familiar but not proficient**
+- **Veusz** — still its own item in Visualization; consider dropping if ggplot2/Shiny/gt are the real story
+- **plotly (R)** — may add later
+- **Power BI, Tableau, Mermaid** — flagged for later consideration
+- **"Claude Code" / LLM wording** — confirm phrasing is appropriate for formal academic CV
 
 ### 13. 📝 Language Skills — Review Before Finalizing
 

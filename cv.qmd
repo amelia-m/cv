@@ -16,6 +16,35 @@ output:
   vitae::latexcv:
     theme: classic
 engine: knitr
+params:
+  # ── Section toggles (all TRUE = full academic CV) ──
+  show_manuscripts:     true    # Manuscripts in Progress (under Refereed Articles)
+  show_preprints:       true    # Preprints (under Refereed Articles)
+  show_presentations:   true    # Papers Presented at Professional Meetings
+  show_mentoring:       true    # Mentoring Experience
+  show_training:        true    # Additional Professional Training
+  show_credentials:     true    # Professional Credentials
+  show_lab_skills:      true    # Technical Skills — Laboratory Assessments
+  show_languages:       true    # Technical Skills — Languages
+  show_profiles:        true    # Online Profiles
+  show_coursework:      false   # Graduate Coursework (supplement; off by default)
+  coursework_detail:    "full"  # "summary", "full", or "both"
+header-includes:
+  # Clear fancyhdr defaults — the latexcv template sets \pagestyle{fancy}
+  # without explicit \lhead/\chead/\rhead, so fancyhdr falls back to printing
+  # \rightmark (the current section/subsection title) as a running header on
+  # every page after the first. That surfaces as orphaned, clipped-looking
+  # text near the top margin (see bib_review_notes / layout fix 2026-04-11).
+  - \fancyhf{}
+  - \renewcommand{\headrulewidth}{0pt}
+  # Prevent widowed section/subsection headings at page bottom.
+  # \needspace reserves minimum vertical space; if insufficient, forces a
+  # page break *before* the heading instead of after it.
+  - \usepackage{needspace}
+  - \let\oldsection\section
+  - \renewcommand{\section}[1]{\needspace{8\baselineskip}\oldsection{#1}}
+  - \let\oldsubsection\subsection
+  - \renewcommand{\subsection}[1]{\needspace{6\baselineskip}\oldsubsection{#1}}
 ---
 
 ```{r setup, include=FALSE}
@@ -27,10 +56,34 @@ library(dplyr)
 library(purrr)
 library(glue)
 library(conflicted)
+library(scholar)
 
 conflicts_prefer(dplyr::filter, dplyr::select, .quiet = TRUE)
 
 source("cv_data.R")
+
+if (params$show_coursework) {
+  source("coursework_data.R")
+}
+
+# Fetch live citation metrics from Google Scholar.
+# Falls back to last-known values if Scholar is unreachable at render time.
+.scholar_id <- "AcbJlasAAAAJ"
+.metrics <- tryCatch(
+  scholar::get_profile(.scholar_id),
+  error = function(e) NULL
+)
+if (!is.null(.metrics)) {
+  .cites   <- format(.metrics$total_cites, big.mark = ",")
+  .hindex  <- .metrics$h_index
+  .i10     <- .metrics$i10_index
+  .metrics_date <- format(Sys.Date(), "%Y-%m-%d")
+} else {
+  .cites        <- "1,727"   # last known
+  .hindex       <- 18
+  .i10          <- 20
+  .metrics_date <- "2026-04-11"
+}
 ```
 
 # Education
@@ -43,6 +96,39 @@ education_data |>
     with  = institution,
     where = location,
     why   = details
+  )
+```
+
+`r if (params$show_coursework) "# Graduate Coursework"`
+
+```{r coursework-summary, eval=params$show_coursework && params$coursework_detail %in% c("summary", "both")}
+coursework_data |>
+  filter(type == "course") |>
+  count(area, sort = TRUE) |>
+  brief_entries(
+    what = area,
+    with = glue("{n} courses")
+  )
+```
+
+```{r coursework-full, eval=params$show_coursework && params$coursework_detail %in% c("full", "both")}
+coursework_data |>
+  filter(type %in% c("course", "practicum")) |>
+  mutate(
+    # sort semesters chronologically
+    .sort_key = case_when(
+      grepl("Spring", semester) ~ paste0(sub("Spring ", "", semester), "-1"),
+      grepl("Summer", semester) ~ paste0(sub("Summer ", "", semester), "-2"),
+      grepl("Fall",   semester) ~ paste0(sub("Fall ", "",   semester), "-3"),
+      TRUE ~ semester
+    )
+  ) |>
+  arrange(institution, .sort_key) |>
+  detailed_entries(
+    what  = title,
+    when  = semester,
+    with  = code,
+    where = institution
   )
 ```
 
@@ -72,7 +158,7 @@ lectures_data |>
 
 # Refereed Journal Articles
 
-*Citations: 1,559 | h-index: 17 | i10-index: 20 — as of 2025-04-28*
+*Citations: `r .cites` | h-index: `r .hindex` | i10-index: `r .i10` — as of `r .metrics_date`*
 *(via Google Scholar)*
 
 ## Published
@@ -90,9 +176,9 @@ bibliography_entries("publications.bib") |>
   )
 ```
 
-## Manuscripts in Progress
+`r if (params$show_manuscripts) "## Manuscripts in Progress"`
 
-```{r manuscripts}
+```{r manuscripts, eval=params$show_manuscripts}
 manuscripts_data |>
   brief_entries(
     what = title,
@@ -101,9 +187,9 @@ manuscripts_data |>
   )
 ```
 
-## Preprints
+`r if (params$show_preprints) "## Preprints"`
 
-```{r preprints}
+```{r preprints, eval=params$show_preprints}
 # ⚠️ Confirm authorship and section placement before v1.0.0
 preprints_data |>
   brief_entries(
@@ -113,16 +199,16 @@ preprints_data |>
   )
 ```
 
-# Papers Presented at Professional Meetings
+`r if (params$show_presentations) "# Papers Presented at Professional Meetings"`
 
-```{r presentations}
+```{r presentations, eval=params$show_presentations}
 bibliography_entries("presentations.bib") |>
   arrange(desc(issued))
 ```
 
-# Mentoring Experience
+`r if (params$show_mentoring) "# Mentoring Experience"`
 
-```{r mentoring}
+```{r mentoring, eval=params$show_mentoring}
 mentoring_data |>
   brief_entries(
     what  = role,
@@ -131,11 +217,11 @@ mentoring_data |>
   )
 ```
 
-# Additional Professional Training
+`r if (params$show_training) "# Additional Professional Training"`
 
-## Nebraska Academy for Methodology, Analytics, & Psychometrics — Nebraska Methodology Applications
+`r if (params$show_training) "## Nebraska Academy for Methodology, Analytics, & Psychometrics — Nebraska Methodology Applications"`
 
-```{r training-mapapps}
+```{r training-mapapps, eval=params$show_training}
 training_data |>
   filter(series == "Nebraska MAP Apps") |>
   brief_entries(
@@ -145,9 +231,9 @@ training_data |>
   )
 ```
 
-## Nebraska Academy for Methodology, Analytics, & Psychometrics — Emerging Scholars Series
+`r if (params$show_training) "## Nebraska Academy for Methodology, Analytics, & Psychometrics — Emerging Scholars Series"`
 
-```{r training-emerging}
+```{r training-emerging, eval=params$show_training}
 training_data |>
   filter(series == "Emerging Scholars") |>
   brief_entries(
@@ -179,9 +265,9 @@ associations_data |>
   )
 ```
 
-# Professional Credentials
+`r if (params$show_credentials) "# Professional Credentials"`
 
-```{r credentials}
+```{r credentials, eval=params$show_credentials}
 credentials_data |>
   brief_entries(
     what  = credential,
@@ -203,9 +289,9 @@ awards_data |>
 
 # Technical Skills
 
-## Laboratory Assessments
+`r if (params$show_lab_skills) "## Laboratory Assessments"`
 
-```{r lab-skills, results="asis"}
+```{r lab-skills, results="asis", eval=params$show_lab_skills}
 cat(paste0("\\begin{itemize}\n",
            paste0("  \\item ", lab_skills, collapse = "\n"),
            "\n\\end{itemize}"))
@@ -221,9 +307,9 @@ software_data |>
   )
 ```
 
-## Languages
+`r if (params$show_languages) "## Languages"`
 
-```{r languages}
+```{r languages, eval=params$show_languages}
 languages_data |>
   brief_entries(
     what  = language,
@@ -231,9 +317,9 @@ languages_data |>
   )
 ```
 
-# Online Profiles
+`r if (params$show_profiles) "# Online Profiles"`
 
-```{r profiles}
+```{r profiles, eval=params$show_profiles}
 profiles_data |>
   brief_entries(
     what = platform,

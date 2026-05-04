@@ -51,7 +51,7 @@ positions_data <- tribble(
     "Cross-disciplinary fellowship integrating research design and methodology, statistics and data science, and public policy. Primary responsibilities include collaborating on funded research projects, contributing to research design, data analysis, and reporting, and supervising graduate students in the Quantitative, Qualitative, and Psychometric Methods (QQPM) program.",
 
   "Postdoctoral Research Associate (contracted affiliation)",
-    "Nebraska Statewide Workforce \\& Educational Reporting System (NSWERS)",
+    "Nebraska Statewide Workforce & Educational Reporting System (NSWERS)",
     "University of Nebraska–Lincoln",        "July 2025–present",
     "Creating privacy-preserving synthetic datasets from large-scale, longitudinal administrative data to support public research initiatives.",
 
@@ -71,7 +71,7 @@ positions_data <- tribble(
     NA_character_,
 
   "Graduate Research Assistant",
-    "Nebraska Academy for Methodology, Analytics \\& Psychometrics, Nebraska Center for Research on Children, Youth, Families, \\& Schools",
+    "Nebraska Academy for Methodology, Analytics & Psychometrics, Nebraska Center for Research on Children, Youth, Families, & Schools",
     "University of Nebraska–Lincoln",        "2018–2021",
     NA_character_,
 
@@ -81,12 +81,12 @@ positions_data <- tribble(
     NA_character_,
 
   "Graduate Research Assistant",
-    "Nebraska Extension — Nutrition Education Program/SNAP-Ed, Department of Nutrition \\& Health Sciences",
+    "Nebraska Extension — Nutrition Education Program/SNAP-Ed, Department of Nutrition & Health Sciences",
     "University of Nebraska–Lincoln",        "Fall 2017",
     NA_character_,
 
   "Graduate Research Assistant",
-    "Neuromuscular Research \\& Imaging Laboratory, Department of Nutrition \\& Health Sciences",
+    "Neuromuscular Research & Imaging Laboratory, Department of Nutrition & Health Sciences",
     "University of Nebraska–Lincoln",        "2015–2017",
     NA_character_,
 
@@ -96,22 +96,22 @@ positions_data <- tribble(
     "EDPS 459 – Statistical Methods.",
 
   "Graduate Teaching Assistant",
-    "Department of Nutrition \\& Health Sciences",
+    "Department of Nutrition & Health Sciences",
     "University of Nebraska–Lincoln",        "2015–2017",
-    "NUTR 250 – Human Nutrition \\& Metabolism (Fall 2015, Fall 2016, Spring 2017); NUTR 484 – Physiology of Exercise Laboratory (Spring 2016); NUTR 486 – Exercise Testing \\& Prescription Laboratory (Spring 2016).",
+    "NUTR 250 – Human Nutrition & Metabolism (Fall 2015, Fall 2016, Spring 2017); NUTR 484 – Physiology of Exercise Laboratory (Spring 2016); NUTR 486 – Exercise Testing & Prescription Laboratory (Spring 2016).",
 
   "Graduate Research Assistant",
-    "Institute of Exercise Physiology \\& Wellness, Department of Educational \\& Human Science",
+    "Institute of Exercise Physiology & Wellness, Department of Educational & Human Science",
     "University of Central Florida",         "2013–2015",
     NA_character_,
 
   "Graduate Teaching Associate",
-    "Department of Educational \\& Human Science",
+    "Department of Educational & Human Science",
     "University of Central Florida",         "2014–2015",
-    "PEM 2104 Personal Fitness (Summer 2014); PET 3005 Intro to Sport \\& Exercise Science (Summer 2014, Fall 2014, Spring 2015); PET 4083 Personal Training Methods (Spring 2015).",
+    "PEM 2104 Personal Fitness (Summer 2014); PET 3005 Intro to Sport & Exercise Science (Summer 2014, Fall 2014, Spring 2015); PET 4083 Personal Training Methods (Spring 2015).",
 
   "Research Practicum",
-    "Institute of Exercise Physiology \\& Wellness, Department of Educational \\& Human Science",
+    "Institute of Exercise Physiology & Wellness, Department of Educational & Human Science",
     "University of Central Florida",         "Fall 2012",
     NA_character_
 )
@@ -127,7 +127,7 @@ lectures_data <- tribble(
     "March 26, 2026",
 
   "Meeting the Demands of High Intensity Interval Training: Metabolic and Physiological Adaptations to High-Intensity Interval Training",
-    "Lecture, 2017 National Strength \\& Conditioning Association National Conference, symposium sponsored by GNC Nutrition, Inc., Las Vegas, NV.",
+    "Lecture, 2017 National Strength & Conditioning Association National Conference, symposium sponsored by GNC Nutrition, Inc., Las Vegas, NV.",
     "July 12–15, 2017"
 )
 
@@ -165,9 +165,10 @@ training_data <- tribble(
 
 service_data <- tribble(
   ~role,                                                    ~organization,                                              ~dates,
-  "Conference Abstract Reviewer",                           "National Strength \\& Conditioning Association",           "2016, 2019",
+  "Conference Abstract Reviewer",                           "National Strength & Conditioning Association",           "2016, 2019",
   "Reviewer",                                              "Journal of Strength and Conditioning Research",            "2016–2020",
   "Reviewer",                                              "Research Quarterly for Exercise and Sport",                "2019–2020",
+  "Reviewer",                                              "Women in Sport and Physical Activity Journal",             "2026–present",
   "Graduate Student Volunteer Poster Judge",               "UNL CEHS Undergraduate Research Fair",                    "2019"
 )
 
@@ -177,13 +178,13 @@ service_data <- tribble(
 
 associations_data <- tribble(
   ~organization,                                                                  ~membership,       ~dates,
-  "American Psychological Association",                                           "Student Member",  "2024–2025",
-  "American Statistical Association",                                             "Student Member",  "2019–2020",
-  "Society for Openness, Transparency and Replication in Kinesiology",           "Student Member",  "2019–present",
-  "National Strength \\& Conditioning Association",
-    "Student Member, 2014–2020; Research Consortium Member, 2019–2020",          NA_character_,
-  "American College of Sports Medicine",                                          "Student Member",  "2013–2020",
-  "National Intramural Recreational Sports Association",                          "Student Member",  "2009–2010"
+  "American Psychological Association",                                           "Member",          "2024–2025",
+  "American Statistical Association",                                             "Member",          "2019–2020",
+  "Society for Openness, Transparency and Replication in Kinesiology",           "Member",          "2019–present",
+  "National Strength & Conditioning Association",
+    "Member, 2014–2020; Research Consortium Member, 2019–2020",                  NA_character_,
+  "American College of Sports Medicine",                                          "Member",          "2013–2020",
+  "National Intramural Recreational Sports Association",                          "Member",          "2009–2010"
 )
 
 # ==============================================================
@@ -192,7 +193,7 @@ associations_data <- tribble(
 
 credentials_data <- tribble(
   ~credential,                                                               ~organization,       ~status,
-  "Certified Strength \\& Conditioning Specialist",                         "National Strength \\& Conditioning Association",  "Expired",
+  "Certified Strength & Conditioning Specialist",                         "National Strength & Conditioning Association",  "Expired",
   "Adult CPR/AED, Child CPR and First Aid Certification",                   "American Red Cross",                              "Expired"
 )
 
@@ -204,7 +205,7 @@ awards_data <- tribble(
   ~award,                             ~organization,                                                    ~dates,
   "Plake Fellowship",                 "Department of Educational Psychology, University of Nebraska–Lincoln", "2024",
   "AAUW Fellowship",                  "American Association of University Women, Lincoln, NE Chapter",        "2019–2020",
-  "Women's Scholarship",              "National Strength \\& Conditioning Association",                       "2016, 2017",
+  "Women's Scholarship",              "National Strength & Conditioning Association",                       "2016, 2017",
   "Othmer Fellowship",                "University of Nebraska–Lincoln",                                       "2015–2018",
   "Graduate Research Excellence Fellowship", "University of Central Florida",                                "2014–2015",
   "Pegasus Scholarship",              "University of Central Florida",                                       "2007–2010",
@@ -217,7 +218,7 @@ awards_data <- tribble(
 
 profiles_data <- tribble(
   ~platform,      ~url,
-  "Google Scholar", "https://scholar.google.com/citations?hl=en\\&user=AcbJlasAAAAJ",
+  "Google Scholar", "https://scholar.google.com/citations?hl=en&user=AcbJlasAAAAJ",
   "LinkedIn",       "https://www.linkedin.com/in/amelia-miramonti/",
   "ResearchGate",   "https://www.researchgate.net/profile/Amelia-Miramonti",
   "ORCiD",          "https://orcid.org/0000-0002-0277-4064",
@@ -232,11 +233,12 @@ profiles_data <- tribble(
 # ==============================================================
 
 lab_skills <- c(
-  "Heart rate, blood pressure, anthropometrics",
-  "Resting metabolic rate, maximal oxygen uptake, Wingate, 3-minute critical power testing",
-  "Isometric, isokinetic, isotonic strength testing",
-  "Electromyographic and mechanomyographic data collection and processing",
-  "Sport performance testing (e.g., sprints, agility, jumps, force plate assessments)",
+  "Heart rate (Polar monitors), blood pressure, anthropometrics",
+  "Resting metabolic rate and maximal oxygen uptake (ParvoMedics TrueOne 2400, Sensormedics Vmax Encore); Wingate and 3-minute critical power testing (Lode Corrival cycle ergometer)",
+  "Isometric, isokinetic, and isotonic strength testing (Biodex System)",
+  "Electromyographic and mechanomyographic data collection and processing (Noraxon Desktop DTS, Biopac)",
+  "Sport performance testing — sprints, agility, jumps, and force plate assessments using custom LabVIEW data collection interfaces",
+  "Physical activity monitoring (Actigraph wGT3X-BT)",
   "Finger prick blood sample collection, basic sample processing"
 )
 
@@ -246,16 +248,24 @@ lab_skills <- c(
 
 software_data <- tribble(
   ~category,                      ~tools,
-  "Statistical \\& Psychometric",
-    "R Statistical Software (tidyverse and related packages); Mplus; SAS; SPSS; MATLAB",
-  "Data Collection \\& Signal Processing",
-    "LabVIEW System Development; Biodex System (isokinetic dynamometry); Noraxon Desktop DTS (EMG/MMG); Actigraph wGT3X-BT; Polar Heart Rate Monitor; ParvoMedics TrueOne 2400 (metabolic cart); Sensormedics Vmax Encore; Lode Corrival Cycle Ergometer; Custom LabVIEW signal processing",
+  "Statistical & Psychometric",
+    "R Statistical Software (tidyverse; lavaan and related psychometric packages; tidysynthesis and syntheval for synthetic data generation and evaluation); Mplus; SAS; SPSS (including PROCESS macro); MATLAB; Jamovi; JASP",
+  "Data Collection & Signal Processing",
+    "LabVIEW (data collection, signal processing, and analysis); Biopac (EMG/MMG data collection)",
+  "Survey & Data Management",
+    "Qualtrics; REDCap",
+  "Reproducible Research & Reference Management",
+    "Quarto / R Markdown; Markdown; LaTeX / TinyTeX; targets (R package for reproducible pipelines); Obsidian; Zotero; Open Science Framework (OSF)",
+  "Development Environments & Editors",
+    "Positron; RStudio; Visual Studio Code; Notepad++",
+  "LLM-Assisted Development",
+    "Claude Code; Gemini / Gemini CLI; GitHub Copilot",
+  "Programming & Version Control",
+    "GitHub / Git; Python; Unix / Bash",
   "Visualization",
-    "Veusz (open-source plotting)",
-  "Productivity \\& Creative",
-    "Adobe Acrobat Pro DC; Adobe Illustrator; Microsoft Office Suite (Excel, PowerPoint, Word)",
-  "Version Control \\& Scripting",
-    "GitHub / Git; Python; Unix / Bash"
+    "ggplot2 (R); Shiny (R); gt / gtsummary (R); kableExtra (R); LabVIEW; Veusz",
+  "Productivity & Collaboration",
+    "Microsoft Office Suite (Excel, PowerPoint, Word, Access, Teams, SharePoint); Adobe Acrobat Pro DC; Adobe Illustrator"
 )
 
 # ==============================================================
@@ -264,8 +274,8 @@ software_data <- tribble(
 
 languages_data <- tribble(
   ~language, ~proficiency,
-  "German",  "\\textasciitilde{}30\\% fluency",
-  "Italian", "\\textasciitilde{}55\\% fluency"
+  "German",  "~30% fluency",
+  "Italian", "~55% fluency"
 )
 
 # ==============================================================
@@ -285,10 +295,10 @@ manuscripts_data <- tribble(
     "In progress",
   "Miramonti AA, Pense SM, Rida Z, Fischer JA, Bovaird JA",
     "School Administrator Perceptions of the School Breakfast Program in Nebraska",
-    "Revise \\& Resubmit",
+    "Revise & Resubmit",
   "Miramonti AA, Pense SM, Rida Z, Fischer JA, Bovaird JA",
     "Parent Perceptions of the School Breakfast Program in Nebraska",
-    "Revise \\& Resubmit",
+    "Revise & Resubmit",
   "Miramonti AA, Jenkins NDM, Gillen ZM",
     "Electromyographic and mechanomyographic amplitude patterns of responses during isometric versus concentric dynamic constant external resistance leg extension muscle actions",
     "In progress",
