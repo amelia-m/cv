@@ -60,10 +60,10 @@ library(scholar)
 
 conflicts_prefer(dplyr::filter, dplyr::select, .quiet = TRUE)
 
-source("cv_data.R")
+source("R/cv_data.R")
 
 if (params$show_coursework) {
-  source("coursework_data.R")
+  source("R/coursework_data.R")
 }
 
 # Fetch live citation metrics from Google Scholar.
@@ -164,7 +164,7 @@ lectures_data |>
 ## Published
 
 ```{r publications}
-bibliography_entries("publications.bib") |>
+bibliography_entries("bib/publications.bib") |>
   arrange(desc(issued)) |>
   mutate(
     author = map(author, \(x) {
@@ -202,7 +202,7 @@ preprints_data |>
 `r if (params$show_presentations) "# Papers Presented at Professional Meetings"`
 
 ```{r presentations, eval=params$show_presentations}
-bibliography_entries("presentations.bib") |>
+bibliography_entries("bib/presentations.bib") |>
   arrange(desc(issued))
 ```
 

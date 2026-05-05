@@ -6,8 +6,8 @@
 # review report.  Does NOT auto-modify publications.bib — all edits are manual.
 #
 # Usage:
-#   source("update_bib.R")          # prints report to console
-#   source("update_bib.R"); writeLines(report, "bib_review.txt")  # also saves
+#   source("R/update_bib.R")          # prints report to console
+#   source("R/update_bib.R"); writeLines(report, "bib-reviews/bib_review.txt")  # also saves
 #
 # Requires:
 #   install.packages(c("scholar", "rorcid", "RefManageR",
@@ -26,7 +26,7 @@ suppressPackageStartupMessages({
 
 .scholar_id <- "AcbJlasAAAAJ"
 .orcid_id   <- "0000-0002-0277-4064"
-.bib_file   <- "publications.bib"
+.bib_file   <- "bib/publications.bib"
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -133,21 +133,21 @@ known_titles_norm <- bib_titles_norm
 known_dois        <- bib_df$doi[bib_df$doi != ""]
 
 # presentations.bib — conference abstracts, posters, invited talks
-pres_df <- load_bib_entries("presentations.bib")
+pres_df <- load_bib_entries("bib/presentations.bib")
 if (!is.null(pres_df)) {
-  message("Reading presentations.bib ... (", nrow(pres_df), " entries)")
+  message("Reading bib/presentations.bib ... (", nrow(pres_df), " entries)")
   known_titles_norm <- c(known_titles_norm, pres_df$title_norm)
   known_dois        <- c(known_dois, pres_df$doi[pres_df$doi != ""])
 }
 
 # cv_data.R → preprints_data (and dissertation/thesis if present as columns)
-if (file.exists("cv_data.R")) {
+if (file.exists("R/cv_data.R")) {
   .env <- new.env()
   ok <- tryCatch({
-    suppressMessages(sys.source("cv_data.R", envir = .env))
+    suppressMessages(sys.source("R/cv_data.R", envir = .env))
     TRUE
   }, error = function(e) {
-    message("  ⚠  Could not source cv_data.R: ", conditionMessage(e))
+    message("  ⚠  Could not source R/cv_data.R: ", conditionMessage(e))
     FALSE
   })
   if (ok && exists("preprints_data", envir = .env)) {
@@ -162,13 +162,13 @@ if (file.exists("cv_data.R")) {
 # bib_ignore.R — user-maintained allowlists (year discrepancies + extra titles)
 .ignore_year  <- list()
 .ignore_count <- 0L
-if (file.exists("bib_ignore.R")) {
+if (file.exists("R/bib_ignore.R")) {
   .ig <- new.env()
   ok <- tryCatch({
-    suppressMessages(sys.source("bib_ignore.R", envir = .ig))
+    suppressMessages(sys.source("R/bib_ignore.R", envir = .ig))
     TRUE
   }, error = function(e) {
-    message("  ⚠  Could not source bib_ignore.R: ", conditionMessage(e))
+    message("  ⚠  Could not source R/bib_ignore.R: ", conditionMessage(e))
     FALSE
   })
   if (ok) {
@@ -283,7 +283,7 @@ add(" UPDATE_BIB REVIEW REPORT — {format(Sys.Date(), '%Y-%m-%d')}")
 hr("═")
 add("")
 add("  Bib file     : {.bib_file}  ({nrow(bib_df)} entries)")
-add("  Cross-refs   : presentations.bib ({if (!is.null(pres_df)) nrow(pres_df) else 0}), cv_data.R::preprints_data, bib_ignore.R ({.ignore_count} extras)")
+add("  Cross-refs   : bib/presentations.bib ({if (!is.null(pres_df)) nrow(pres_df) else 0}), R/cv_data.R::preprints_data, R/bib_ignore.R ({.ignore_count} extras)")
 add("  Known titles : {length(known_titles_norm)} pooled from all sources")
 add("  Scholar      : {if (!is.null(scholar_raw)) nrow(scholar_raw) else 'fetch failed'} publications")
 add("  ORCID        : {if (!is.null(orcid_df)) nrow(orcid_df) else 'fetch failed'} works")

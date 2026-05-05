@@ -1,14 +1,14 @@
 # render.R — Render CV variants from a single cv.qmd source
 #
 # Usage:
-#   Rscript render.R                  # full academic CV (default)
-#   Rscript render.R faculty          # faculty application (no manuscripts in progress)
-#   Rscript render.R industry         # non-academic (trimmed)
-#   Rscript render.R coursework       # full CV + graduate coursework supplement
-#   Rscript render.R coursework-only  # standalone coursework listing
+#   Rscript R/render.R                  # full academic CV (default)
+#   Rscript R/render.R faculty          # faculty application (no manuscripts in progress)
+#   Rscript R/render.R industry         # non-academic (trimmed)
+#   Rscript R/render.R coursework       # full CV + graduate coursework supplement
+#   Rscript R/render.R coursework-only  # standalone coursework listing
 #
 # Or source() interactively and call:
-#   render_cv("faculty")
+#   render_cv("faculty")  # after source("R/render.R")
 #
 # Requires internet access to fetch live citation metrics from Google Scholar.
 # If Scholar is unreachable, falls back to the last-known values hardcoded
