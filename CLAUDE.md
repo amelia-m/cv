@@ -18,8 +18,10 @@ Named profiles (pass as first arg to `Rscript R/render.R <profile>`):
 | `full` (default) | All sections |
 | `faculty` | No manuscripts in progress |
 | `industry` | Lean version — drops presentations, training, lab skills, etc. |
-| `coursework` | Full CV + graduate coursework appendix |
+| `coursework` | Full CV + graduate coursework (full course list) |
+| `coursework-summary` | Full CV + graduate coursework (area-count summary only) |
 | `coursework-only` | Standalone coursework supplement |
+| `all` | Render every profile sequentially, with a summary table |
 
 Or call directly: `render_cv("faculty")` after `source("R/render.R")`.
 
