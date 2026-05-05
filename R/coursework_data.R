@@ -108,25 +108,3 @@ coursework_data <- tribble(
   "UNL", "COMB 104",  "Krav Maga I",                                                      1L, "Fall 2019",    "other",      NA_character_,
   "UNL", "COMB 114",  "Krav Maga II",                                                     1L, "Spring 2020",  "other",      NA_character_
 )
-
-
-# ==============================================================
-# Area definitions — for summary generation
-# ==============================================================
-#
-# These are the thematic tags used in the `area` column above.
-# Adjust descriptions as needed; they can drive a narrative
-# summary or grouped display.
-
-area_descriptions <- tribble(
-  ~area,                                ~description,
-  "Quantitative Methods & Statistics",  "Correlational, experimental, and advanced methods including multilevel modeling, longitudinal analysis, SEM, multivariate analysis, and simulation",
-  "Psychometrics & Measurement",        "Classical and modern test theory, item response theory, structural equation modeling, measurement evaluation, and assessment of special populations",
-  "Research Methods & Design",          "Foundations of educational research, qualitative approaches, survey methodology, and correlational/experimental design",
-  "Exercise Science & Physiology",      "Exercise physiology, neuromuscular mechanisms, exercise testing and prescription, environmental physiology",
-  "Sport Nutrition & Biochemistry",     "Sport nutrition, dietary supplements, exercise biochemistry, metabolism, and exercise-nutrition interactions",
-  "Strength & Conditioning",            "Program design and applied strength and conditioning",
-  "Cognitive Science & Development",    "Human cognition and instruction, mind-brain-education, and cognitive development",
-  "Computing & Data Science",           "Statistical computing in R, applied multivariate statistics using R, data visualization, and computer-assisted research data analysis",
-  "Professional Development",           "Grant writing and directed field experience (practicum)"
-)

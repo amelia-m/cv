@@ -28,24 +28,13 @@ suppressPackageStartupMessages({
 .orcid_id   <- "0000-0002-0277-4064"
 .bib_file   <- "bib/publications.bib"
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# -- Helpers -------------------------------------------------------------------
 
 # Strip punctuation/case for fuzzy title matching
 norm_title <- function(x) {
   str_to_lower(x) |>
     str_replace_all("[^a-z0-9 ]", " ") |>
     str_squish()
-}
-
-# Check whether two normalised titles are "probably the same paper".
-# Uses a word-overlap ratio — robust to minor subtitle differences.
-titles_match <- function(a, b, threshold = 0.70) {
-  words_a <- str_split(a, " ")[[1]]
-  words_b <- str_split(b, " ")[[1]]
-  if (length(words_a) == 0 || length(words_b) == 0) return(FALSE)
-  overlap  <- sum(words_a %in% words_b)
-  min_len  <- min(length(words_a), length(words_b))
-  (overlap / min_len) >= threshold
 }
 
 # Find the bib key of the best-matching entry for a given title.
@@ -111,7 +100,7 @@ load_bib_entries <- function(path) {
     mutate(title_norm = norm_title(title))
 }
 
-# ── 1. Load publications.bib (authoritative source for Sections 2, 4, 5) ────
+# -- 1. Load publications.bib (authoritative source for Sections 2, 4, 5) ----
 
 message("Reading ", .bib_file, " ...")
 bib_df <- load_bib_entries(.bib_file) |>
@@ -120,7 +109,7 @@ bib_df <- load_bib_entries(.bib_file) |>
 bib_keys        <- bib_df$key
 bib_titles_norm <- bib_df$title_norm
 
-# ── 1b. Load additional "known title" sources ────────────────────────────────
+# -- 1b. Load additional "known title" sources --------------------------------
 #
 # Sections 1 and 3 ask "is this Scholar/ORCID entry already in the CV?"  That
 # question should include more than publications.bib — presentations, preprints,
@@ -189,7 +178,7 @@ if (file.exists("R/bib_ignore.R")) {
 known_titles_norm <- unique(known_titles_norm[known_titles_norm != ""])
 known_dois        <- unique(known_dois)
 
-# ── 2. Fetch Google Scholar publications ──────────────────────────────────────
+# -- 2. Fetch Google Scholar publications --------------------------------------
 
 message("Fetching Google Scholar publications ...")
 scholar_raw <- tryCatch(
@@ -200,7 +189,7 @@ scholar_raw <- tryCatch(
   }
 )
 
-# ── 3. Fetch ORCID works ──────────────────────────────────────────────────────
+# -- 3. Fetch ORCID works ------------------------------------------------------
 
 message("Fetching ORCID works ...")
 orcid_raw <- tryCatch(
@@ -211,7 +200,7 @@ orcid_raw <- tryCatch(
   }
 )
 
-# ── 4. Parse ORCID into a tidy tibble ─────────────────────────────────────────
+# -- 4. Parse ORCID into a tidy tibble -----------------------------------------
 
 parse_orcid_works <- function(raw) {
   if (is.null(raw)) return(NULL)
@@ -220,7 +209,7 @@ parse_orcid_works <- function(raw) {
     works <- raw[[1]]$works
     if (is.null(works) || nrow(works) == 0) return(NULL)
 
-    # Extract titles ──────────────────────────────────────────────────────────
+    # Extract titles ----------------------------------------------------------
     titles <- works[["work.title.title.value"]]
     if (is.null(titles)) {
       # Alternate column name in some API versions
@@ -228,15 +217,15 @@ parse_orcid_works <- function(raw) {
       titles <- if (!is.na(titles_col)) works[[titles_col]] else rep(NA_character_, nrow(works))
     }
 
-    # Extract years ───────────────────────────────────────────────────────────
+    # Extract years -----------------------------------------------------------
     year_col <- grep("publication.date.year.value|published.year", names(works), value = TRUE)[1]
     years <- if (!is.na(year_col)) works[[year_col]] else rep(NA_character_, nrow(works))
 
-    # Extract journals ────────────────────────────────────────────────────────
+    # Extract journals --------------------------------------------------------
     journal_col <- grep("journal.title.value", names(works), value = TRUE)[1]
     journals <- if (!is.na(journal_col)) works[[journal_col]] else rep(NA_character_, nrow(works))
 
-    # Extract DOIs from nested external-ids list column ───────────────────────
+    # Extract DOIs from nested external-ids list column -----------------------
     ext_col <- grep("external.id$", names(works), value = TRUE)[1]
     if (is.na(ext_col)) ext_col <- grep("external-id$", names(works), value = TRUE)[1]
     dois <- if (!is.na(ext_col)) {
@@ -272,15 +261,15 @@ parse_orcid_works <- function(raw) {
 
 orcid_df <- parse_orcid_works(orcid_raw)
 
-# ── 5. Build the report ───────────────────────────────────────────────────────
+# -- 5. Build the report -------------------------------------------------------
 
 lines <- character(0)
 add   <- function(...) lines <<- c(lines, glue(..., .envir = parent.frame()))
-hr    <- function(char = "─", width = 60) add(paste(rep(char, width), collapse = ""))
+hr    <- function(char = "-", width = 60) add(paste(rep(char, width), collapse = ""))
 
-hr("═")
+hr("=")
 add(" UPDATE_BIB REVIEW REPORT — {format(Sys.Date(), '%Y-%m-%d')}")
-hr("═")
+hr("=")
 add("")
 add("  Bib file     : {.bib_file}  ({nrow(bib_df)} entries)")
 add("  Cross-refs   : bib/presentations.bib ({if (!is.null(pres_df)) nrow(pres_df) else 0}), R/cv_data.R::preprints_data, R/bib_ignore.R ({.ignore_count} extras)")
@@ -289,7 +278,7 @@ add("  Scholar      : {if (!is.null(scholar_raw)) nrow(scholar_raw) else 'fetch 
 add("  ORCID        : {if (!is.null(orcid_df)) nrow(orcid_df) else 'fetch failed'} works")
 add("")
 
-# ── 5a. Scholar: unmatched entries ─────────────────────────────────────────
+# -- 5a. Scholar: unmatched entries -------------------------------------------
 
 hr()
 add(" SECTION 1 — Scholar publications not matched in any known source")
@@ -325,7 +314,7 @@ if (is.null(scholar_raw)) {
     })
   }
 
-  # ── 5b. Scholar: year discrepancies ─────────────────────────────────────────
+  # -- 5b. Scholar: year discrepancies -----------------------------------------
 
   hr()
   add(" SECTION 2 — Year discrepancies (bib vs Scholar)")
@@ -376,7 +365,7 @@ if (is.null(scholar_raw)) {
   }
 }
 
-# ── 5c. ORCID: unmatched entries ─────────────────────────────────────────────
+# -- 5c. ORCID: unmatched entries ---------------------------------------------
 
 hr()
 add(" SECTION 3 — ORCID works not matched in any known source")
@@ -418,7 +407,7 @@ if (is.null(orcid_df)) {
     })
   }
 
-  # ── 5d. ORCID: DOI enrichment opportunities ────────────────────────────────
+  # -- 5d. ORCID: DOI enrichment opportunities --------------------------------
 
   hr()
   add(" SECTION 4 — DOI enrichment: ORCID has DOI but bib entry has none")
@@ -452,7 +441,7 @@ if (is.null(orcid_df)) {
   }
 }
 
-# ── 5e. Bib entries with no vol/issue/pages ─────────────────────────────────
+# -- 5e. Bib entries with no vol/issue/pages ----------------------------------
 
 hr()
 add(" SECTION 5 — Bib entries missing vol / issue / pages")
@@ -483,15 +472,15 @@ if (nrow(incomplete) == 0) {
   })
 }
 
-# ── 6. Footer ─────────────────────────────────────────────────────────────────
+# -- 6. Footer -----------------------------------------------------------------
 
-hr("═")
+hr("=")
 add(" Review complete.  Edit publications.bib manually as needed.")
 add(" Rerun this script after updates to confirm all issues resolved.")
-hr("═")
+hr("=")
 add("")
 
-# ── 7. Print & optionally save ────────────────────────────────────────────────
+# -- 7. Print & optionally save ------------------------------------------------
 
 report <- lines
 cat(paste(report, collapse = "\n"))

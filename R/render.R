@@ -73,10 +73,56 @@ profiles <- list(
 )
 
 # ------------------------------------------------------------------
+# Vitae template patch self-check
+# ------------------------------------------------------------------
+# The latexcv template at the path below has been manually patched for
+# FontAwesome 5 and a bottom-margin fix.  Reinstalling/upgrading the
+# `vitae` package overwrites the template silently, which surfaces as
+# missing footer icons or clipped text in the rendered PDF.
+#
+# This check reads the installed template and warns if the expected
+# patch markers are absent.  Non-fatal — it just prints to the console.
+
+check_vitae_patch <- function() {
+  tmpl <- system.file(
+    "rmarkdown/templates/latexcv/resources/classic/main.tex",
+    package = "vitae"
+  )
+  if (!nzchar(tmpl) || !file.exists(tmpl)) {
+    message("vitae patch check: template not found at expected path; skipping.")
+    return(invisible(FALSE))
+  }
+  txt <- readLines(tmpl, warn = FALSE)
+  blob <- paste(txt, collapse = "\n")
+
+  checks <- list(
+    fontawesome5 = grepl("\\\\usepackage\\{fontawesome5\\}", blob),
+    bottom_2cm   = grepl("bottom=2cm", blob, fixed = TRUE),
+    faIcon       = grepl("\\\\faIcon\\{", blob)
+  )
+  missing <- names(checks)[!unlist(checks)]
+  if (length(missing) > 0) {
+    warning(
+      "vitae template patch appears incomplete (missing: ",
+      paste(missing, collapse = ", "),
+      "). Footer icons / margins may break. ",
+      "Re-apply patch from README.md to: ", tmpl,
+      call. = FALSE
+    )
+    return(invisible(FALSE))
+  }
+  invisible(TRUE)
+}
+
+# ------------------------------------------------------------------
 # Render function
 # ------------------------------------------------------------------
 
 render_cv <- function(profile = "full", output_dir = "output") {
+  if (!file.exists("cv.qmd")) {
+    stop("Working directory must be the CV repo root (cv.qmd not found in '", getwd(), "').")
+  }
+  check_vitae_patch()
   if (!profile %in% names(profiles)) {
     stop("Unknown profile '", profile, "'. Available: ",
          paste(names(profiles), collapse = ", "))
