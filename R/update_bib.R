@@ -37,37 +37,82 @@ norm_title <- function(x) {
     str_squish()
 }
 
-# Find the bib key of the best-matching entry for a given title.
-# Returns NA_character_ if no entry meets the threshold.
+# Normalize a DOI for comparison: strip whitespace, lowercase, NULL/NA → "".
+norm_doi <- function(x) {
+  if (is.null(x)) return("")
+  out <- str_trim(tolower(as.character(x)))
+  out[is.na(out)] <- ""
+  out
+}
+
+# Containment similarity over normalized title word sets:
+#   |A ∩ B| / min(|A|, |B|).
+# Returns a value in [0, 1].  Empty input on either side returns 0.
+# Containment is tolerant of one-sided length differences — Scholar often
+# appends conference-program noise to titles (e.g. "...: 1369 Board# 131 May
+# 30 9:30 AM-11:00 AM") that would tank a symmetric metric like Jaccard or
+# Dice.  Spurious short-title matches are blocked separately by the min_words
+# floor in title_match_ok().
+title_similarity <- function(a, b) {
+  words_a <- unique(str_split(a, " ")[[1]])
+  words_b <- unique(str_split(b, " ")[[1]])
+  words_a <- words_a[words_a != ""]
+  words_b <- words_b[words_b != ""]
+  if (length(words_a) == 0 || length(words_b) == 0) return(0)
+  overlap <- length(intersect(words_a, words_b))
+  min_len <- min(length(words_a), length(words_b))
+  if (min_len == 0) return(0)
+  overlap / min_len
+}
+
+# Are two normalized titles "the same paper"?  Requires containment >=
+# threshold AND both titles to have at least `min_words` words.  The
+# min-word floor blocks Scholar parsing artifacts like "Back Issues" (2
+# words) from spuriously matching any longer title containing both words.
+# Larger artifacts (4+ words, e.g. "Open Library of Bioscience") are
+# expected to be added to R/bib_ignore.R::extra_matched_titles instead.
+title_match_ok <- function(a, b, threshold = 0.70, min_words = 4) {
+  # Exact normalized-string match short-circuits the floor — needed so
+  # short entries in bib_ignore.R::extra_matched_titles (e.g. the 2-word
+  # Scholar artifact "Back Issues") match themselves in the known-titles
+  # pool.  Safe because a == b leaves no room for a false positive.
+  if (nzchar(a) && identical(a, b)) return(TRUE)
+  words_a <- str_split(a, " ")[[1]]
+  words_b <- str_split(b, " ")[[1]]
+  words_a <- words_a[words_a != ""]
+  words_b <- words_b[words_b != ""]
+  if (length(words_a) < min_words || length(words_b) < min_words) return(FALSE)
+  title_similarity(a, b) >= threshold
+}
+
+# Find the bib key of the best-matching entry for a given title, using the
+# shared Jaccard + min-word floor helpers.
+# Returns NA_character_ if no entry meets the threshold + min-word floor.
 find_bib_match <- function(query_title_norm, bib_titles_norm, keys,
-                           threshold = 0.70) {
+                           threshold = 0.70, min_words = 4) {
   if (length(bib_titles_norm) == 0) return(NA_character_)
-  scores <- map_dbl(bib_titles_norm, \(bt) {
-    words_q <- str_split(query_title_norm, " ")[[1]]
-    words_b <- str_split(bt, " ")[[1]]
-    if (length(words_q) == 0 || length(words_b) == 0) return(0)
-    overlap <- sum(words_q %in% words_b)
-    min_len <- min(length(words_q), length(words_b))
-    overlap / min_len
-  })
+  scores <- map_dbl(bib_titles_norm, \(bt) title_similarity(query_title_norm, bt))
   best_idx <- which.max(scores)
-  if (scores[best_idx] >= threshold) keys[best_idx] else NA_character_
+  if (length(best_idx) == 0) return(NA_character_)
+  if (scores[best_idx] >= threshold &&
+      title_match_ok(query_title_norm, bib_titles_norm[best_idx],
+                     threshold = threshold, min_words = min_words)) {
+    keys[best_idx]
+  } else {
+    NA_character_
+  }
 }
 
 # Lightweight "is this title already known?" check against a pooled vector of
 # normalised titles from multiple sources (publications.bib, presentations.bib,
-# preprints_data, dissertation/thesis titles, bib_ignore extras, etc.).
-title_is_known <- function(query_norm, known_norms, threshold = 0.70) {
+# preprints_data, dissertation/thesis titles, bib_ignore extras, etc.).  Uses
+# the shared Jaccard + min-word floor helpers.
+title_is_known <- function(query_norm, known_norms, threshold = 0.70,
+                           min_words = 4) {
   if (length(known_norms) == 0) return(FALSE)
-  words_q <- str_split(query_norm, " ")[[1]]
-  if (length(words_q) == 0) return(FALSE)
-  any(map_lgl(known_norms, \(k) {
-    words_k <- str_split(k, " ")[[1]]
-    if (length(words_k) == 0) return(FALSE)
-    overlap <- sum(words_q %in% words_k)
-    min_len <- min(length(words_q), length(words_k))
-    (overlap / min_len) >= threshold
-  }))
+  any(map_lgl(known_norms, \(k) title_match_ok(query_norm, k,
+                                              threshold = threshold,
+                                              min_words = min_words)))
 }
 
 # Load a BibTeX file into a tidy tibble.  Returns NULL if the file is missing
@@ -93,7 +138,7 @@ load_bib_entries <- function(path) {
       volume  = as.character(e$volume  %||% ""),
       number  = as.character(e$number  %||% ""),
       pages   = as.character(e$pages   %||% ""),
-      doi     = tolower(as.character(e$doi %||% "")),
+      doi     = norm_doi(e$doi),
       note    = as.character(e$note    %||% "")
     )
   }) |>
@@ -105,6 +150,10 @@ load_bib_entries <- function(path) {
 message("Reading ", .bib_file, " ...")
 bib_df <- load_bib_entries(.bib_file) |>
   select(-source)   # keep the simple shape Sections 2/4/5 expect
+
+if (is.null(bib_df) || nrow(bib_df) == 0) {
+  stop("publications.bib could not be loaded or is empty: ", .bib_file)
+}
 
 bib_keys        <- bib_df$key
 bib_titles_norm <- bib_df$title_norm
@@ -141,10 +190,10 @@ if (file.exists("R/cv_data.R")) {
   })
   if (ok && exists("preprints_data", envir = .env)) {
     pre_titles <- as.character(.env$preprints_data$title)
-    pre_dois   <- tolower(as.character(.env$preprints_data$doi %||% ""))
+    pre_dois   <- norm_doi(.env$preprints_data$doi)
     message("Reading cv_data.R::preprints_data ... (", length(pre_titles), " entries)")
     known_titles_norm <- c(known_titles_norm, norm_title(pre_titles))
-    known_dois        <- c(known_dois, pre_dois[pre_dois != "" & !is.na(pre_dois)])
+    known_dois        <- c(known_dois, pre_dois[pre_dois != ""])
   }
 }
 
@@ -176,15 +225,22 @@ if (file.exists("R/bib_ignore.R")) {
 }
 
 known_titles_norm <- unique(known_titles_norm[known_titles_norm != ""])
+stopifnot(length(known_titles_norm) > 0)
 known_dois        <- unique(known_dois)
 
 # -- 2. Fetch Google Scholar publications --------------------------------------
 
+.fetch_scholar <- purrr::insistently(
+  scholar::get_publications,
+  rate    = purrr::rate_backoff(max_times = 3, pause_base = 5),
+  quiet   = FALSE
+)
+
 message("Fetching Google Scholar publications ...")
 scholar_raw <- tryCatch(
-  scholar::get_publications(.scholar_id),
+  .fetch_scholar(.scholar_id),
   error = function(e) {
-    message("  ⚠  Scholar fetch failed: ", conditionMessage(e))
+    message("  WARN  Scholar fetch failed after retries: ", conditionMessage(e))
     NULL
   }
 )
@@ -216,6 +272,11 @@ parse_orcid_works <- function(raw) {
       titles_col <- grep("title\\.value$", names(works), value = TRUE)[1]
       titles <- if (!is.na(titles_col)) works[[titles_col]] else rep(NA_character_, nrow(works))
     }
+    if (length(titles) == 0 || all(is.na(titles))) {
+      stop("ORCID schema probe failed (no titles extracted). ",
+           "Column names available: ",
+           paste(names(works), collapse = ", "))
+    }
 
     # Extract years -----------------------------------------------------------
     year_col <- grep("publication.date.year.value|published.year", names(works), value = TRUE)[1]
@@ -237,7 +298,7 @@ parse_orcid_works <- function(raw) {
         if (is.na(type_col) || is.na(value_col)) return(NA_character_)
         doi_rows <- x[x[[type_col]] == "doi", , drop = FALSE]
         if (nrow(doi_rows) == 0) return(NA_character_)
-        tolower(doi_rows[[value_col]][1])
+        norm_doi(doi_rows[[value_col]][1])
       })
     } else {
       rep(NA_character_, nrow(works))
@@ -266,6 +327,12 @@ orcid_df <- parse_orcid_works(orcid_raw)
 lines <- character(0)
 add   <- function(...) lines <<- c(lines, glue(..., .envir = parent.frame()))
 hr    <- function(char = "-", width = 60) add(paste(rep(char, width), collapse = ""))
+
+n_unmatched_scholar <- 0L
+n_year_issues       <- 0L
+n_unmatched_orcid   <- 0L
+n_doi_gaps          <- 0L
+n_incomplete        <- 0L
 
 hr("=")
 add(" UPDATE_BIB REVIEW REPORT — {format(Sys.Date(), '%Y-%m-%d')}")
@@ -297,6 +364,7 @@ if (is.null(scholar_raw)) {
   # presentations.bib + preprints_data + bib_ignore extras).
   scholar_unmatched <- scholar_df |>
     filter(!map_lgl(title_norm, \(t) title_is_known(t, known_titles_norm)))
+  n_unmatched_scholar <- nrow(scholar_unmatched)
 
   if (nrow(scholar_unmatched) == 0) {
     add("  ✓ All Scholar publications matched against a known source.")
@@ -339,6 +407,7 @@ if (is.null(scholar_raw)) {
       year != scholar_year,
       !key %in% names(.ignore_year)
     )
+  n_year_issues <- nrow(year_issues)
 
   if (nrow(year_issues) == 0) {
     add("  ✓ No year discrepancies detected.")
@@ -390,6 +459,7 @@ if (is.null(orcid_df)) {
       # Title match against the pooled known-titles vector
       !title_is_known(row$title_norm, known_titles_norm)
     }))
+  n_unmatched_orcid <- nrow(orcid_unmatched)
 
   if (nrow(orcid_unmatched) == 0) {
     add("  ✓ All ORCID works matched in bib.")
@@ -424,6 +494,7 @@ if (is.null(orcid_df)) {
     filter(!is.na(bib_key)) |>
     left_join(bib_df |> select(key, bib_doi = doi), by = c("bib_key" = "key")) |>
     filter(is.na(bib_doi) | bib_doi == "")
+  n_doi_gaps <- nrow(doi_opportunities)
 
   if (nrow(doi_opportunities) == 0) {
     add("  ✓ No missing DOIs found (or no DOI data in ORCID).")
@@ -451,6 +522,7 @@ add("")
 incomplete <- bib_df |>
   filter(volume == "" | pages == "") |>
   filter(!str_detect(note, "(?i)online|in press|accepted"))
+n_incomplete <- nrow(incomplete)
 
 if (nrow(incomplete) == 0) {
   add("  ✓ All entries have volume/pages (or are marked as online-first).")
@@ -482,6 +554,30 @@ add("")
 
 # -- 7. Print & optionally save ------------------------------------------------
 
-report <- lines
+total_issues <- n_unmatched_scholar + n_year_issues + n_unmatched_orcid +
+                n_doi_gaps + n_incomplete
+status_line <- sprintf(
+  "STATUS: %d unmatched-scholar | %d year-issues | %d unmatched-ORCID | %d DOI-gaps | %d incomplete",
+  n_unmatched_scholar, n_year_issues, n_unmatched_orcid,
+  n_doi_gaps, n_incomplete
+)
+# Insert STATUS line right after the top "===" rule and title (lines 1-3 of `lines`).
+report <- c(lines[1:3], paste0(" ", status_line), lines[4:length(lines)])
 cat(paste(report, collapse = "\n"))
+
+# Auto-save dated report (Change 7 below).
+if (dir.exists("bib-reviews")) {
+  dated_path <- file.path("bib-reviews",
+                          paste0("bib_review_", format(Sys.Date(), "%Y-%m-%d"), ".txt"))
+  latest_path <- file.path("bib-reviews", "bib_review.txt")
+  writeLines(report, dated_path)
+  writeLines(report, latest_path)
+  message("\nReport saved: ", dated_path)
+}
+
+# Non-zero exit code in script mode if any issues found.
+if (!interactive()) {
+  quit(save = "no", status = as.integer(total_issues > 0))
+}
+
 invisible(report)
