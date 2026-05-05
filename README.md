@@ -1,26 +1,27 @@
 # Amelia A. Miramonti — Curriculum Vitae
 
-Reproducible, version-controlled CV built with [Quarto](https://quarto.org) and the [`vitae`](https://pkg.mitchelloharawild.com/vitae/) R package (`awesomecv` template).
+Reproducible, version-controlled academic CV built with the [`vitae`](https://pkg.mitchelloharawild.com/vitae/) R package (`latexcv` / classic template) and rendered via **R Markdown + knitr** — not the Quarto CLI (see note below).
 
 ## Repository structure
 
 | File | Purpose |
 |------|---------|
 | `cv.qmd` | Main CV document — layout and section order |
-| `cv_data.R` | Structured data (education, positions, awards, skills, etc.) |
-| `publications.bib` | BibTeX — 31 peer-reviewed journal articles |
-| `presentations.bib` | BibTeX — ~53 conference presentations |
-| `render.R` | One-liner render script (see below) |
-| `update_bib.R` | Standalone script — fetches Scholar + ORCID, reports new/changed entries |
-| `bib_ignore.R` | Allowlists for `update_bib.R` (known-stale years, non-bib titles) |
-| `bib_review_notes.md` | Rolling log of bib reconciliation decisions |
-| `Miramonti_CV_2026-03-04.md` | Authoritative plain-text CV — source of record for content edits |
-| `Miramonti_CV_review_notes.md` | Open items and change log |
+| `R/cv_data.R` | Structured data (education, positions, awards, skills, etc.) |
+| `R/coursework_data.R` | Graduate coursework data (sourced only when `show_coursework = TRUE`) |
+| `R/render.R` | Profile-based render script (see below) |
+| `R/update_bib.R` | Standalone script — fetches Scholar + ORCID, reports new/changed entries |
+| `R/bib_ignore.R` | Allowlists for `update_bib.R` (known-stale years, non-bib titles) |
+| `bib/publications.bib` | BibTeX — peer-reviewed journal articles |
+| `bib/presentations.bib` | BibTeX — conference presentations |
+| `bib-reviews/bib_review_notes.md` | Rolling log of bib reconciliation decisions |
+| `docs/Miramonti_CV_2026-03-04.md` | Authoritative plain-text CV — source of record for content edits |
+| `docs/Miramonti_CV_review_notes.md` | Open items and change log |
 
 ## Prerequisites
 
 - **R ≥ 4.5** — [https://cran.r-project.org](https://cran.r-project.org)
-- **Quarto** — bundled in [Positron](https://positron.posit.co) or install standalone from [https://quarto.org](https://quarto.org)
+- **Quarto** — not required for rendering (see note below), but bundled in [Positron](https://positron.posit.co) which is the recommended IDE
 - **R packages:**
 
 ```r
@@ -37,13 +38,35 @@ tinytex::install_tinytex()   # one-time, ~5 min
 
 ## Rendering
 
-Open Positron, set the working directory to this repo, then run:
+Open Positron (or any R console), set the working directory to this repo, then run:
 
 ```r
-source("render.R")
+source("R/render.R")
 ```
 
 Output: `output/cv.pdf`
+
+### Render profiles
+
+Multiple named profiles are available to produce targeted variants:
+
+| Profile | Command | Output |
+|---------|---------|--------|
+| `full` *(default)* | `render_cv()` | All sections — full academic CV |
+| `faculty` | `render_cv("faculty")` | Drops manuscripts in progress |
+| `industry` | `render_cv("industry")` | Lean version — drops presentations, training, lab skills, etc. |
+| `coursework` | `render_cv("coursework")` | Full CV + graduate coursework (full course list) |
+| `coursework-summary` | `render_cv("coursework-summary")` | Full CV + graduate coursework (area-count summary only) |
+| `coursework-only` | `render_cv("coursework-only")` | Standalone coursework supplement |
+| `all` | `render_cv("all")` | Render every profile sequentially, with a summary table |
+
+You can also pass `--dated` or `--quiet` flags via `Rscript`:
+
+```r
+Rscript R/render.R faculty          # faculty profile
+Rscript R/render.R full --dated     # cv_2026-05-04.pdf (date-stamped)
+Rscript R/render.R full --quiet     # suppress LaTeX progress output
+```
 
 > **Note:** Use `rmarkdown::render("cv.qmd")`, not `quarto render cv.qmd`.
 > The `vitae` package uses the R Markdown rendering pipeline;
@@ -55,16 +78,16 @@ Run periodically (e.g., before re-submitting a job application) to catch new
 publications or updated metadata:
 
 ```r
-source("update_bib.R")
+source("R/update_bib.R")
 ```
 
 The script fetches your publication list from **Google Scholar** and **ORCID**,
 and compares both against a pooled "known titles" vector built from:
 
-- `publications.bib` (authoritative for Sections 2, 4, 5)
-- `presentations.bib` (conference abstracts, posters, invited talks)
-- `cv_data.R` → `preprints_data` (preprints/working papers)
-- `bib_ignore.R` → `extra_matched_titles` (dissertations, theses, known parsing artifacts)
+- `bib/publications.bib` (authoritative for Sections 2, 4, 5)
+- `bib/presentations.bib` (conference abstracts, posters, invited talks)
+- `R/cv_data.R` → `preprints_data` (preprints/working papers)
+- `R/bib_ignore.R` → `extra_matched_titles` (dissertations, theses, known parsing artifacts)
 
 It then prints a report covering:
 
@@ -80,14 +103,14 @@ It then prints a report covering:
 To also save the report to a file:
 
 ```r
-source("update_bib.R"); writeLines(report, "bib_review.txt")
+source("R/update_bib.R"); writeLines(report, "bib-reviews/bib_review.txt")
 ```
 
-### Suppressing known false positives (`bib_ignore.R`)
+### Suppressing known false positives (`R/bib_ignore.R`)
 
 Some discrepancies are persistent but legitimate — e.g., Google Scholar reports
 an Epub-ahead-of-print year while `publications.bib` uses the final print year.
-To stop these from surfacing on every rerun, add them to `bib_ignore.R`:
+To stop these from surfacing on every rerun, add them to `R/bib_ignore.R`:
 
 ```r
 # Year-discrepancy allowlist (bib key → reason)
@@ -143,7 +166,7 @@ installed template file:
 
 ## Open items (⚠️ hold v1.0.0)
 
-See `Miramonti_CV_review_notes.md` for full details. Outstanding items:
+See `docs/Miramonti_CV_review_notes.md` for full details. Outstanding items:
 
 1. Wick K et al. APA 2024 — confirm presentation occurred; add full author list
 2. Bovaird et al. IMPS 2024 Prague — confirm presentation occurred
