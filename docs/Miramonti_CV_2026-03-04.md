@@ -40,7 +40,7 @@ amiramonti@nebraska.edu
 **Postdoctoral Researcher**
 - Nebraska Evaluation and Research Center (NEAR Center) — Department of Educational Psychology, July 2025–present
 
-  Cross-disciplinary fellowship integrating research design and methodology, statistics and data science, and public policy. Primary responsibilities include collaborating on funded research projects, contributing to research design, data analysis, and reporting, and supervising graduate students in the Quantitative, Qualitative, and Psychometric Methods (QQPM) program.
+  Cross-disciplinary appointment integrating research design and methodology, statistics and data science, and public policy. Primary responsibilities include collaborating on funded research projects, contributing to research design, data analysis, and reporting, and supervising graduate students in the Quantitative, Qualitative, and Psychometric Methods (QQPM) program.
 
   *Contracted affiliations (July 2025–present):*
   - Postdoctoral Research Associate — Nebraska Statewide Workforce & Educational Reporting System (NSWERS): creating privacy-preserving synthetic datasets from large-scale, longitudinal administrative data to support public research initiatives

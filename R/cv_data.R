@@ -48,7 +48,7 @@ positions_data <- tribble(
   "Postdoctoral Researcher",
     "Nebraska Evaluation and Research Center (NEAR Center), Department of Educational Psychology",
     "University of Nebraska–Lincoln",        "July 2025–present",
-    "Cross-disciplinary fellowship integrating research design and methodology, statistics and data science, and public policy. Primary responsibilities include collaborating on funded research projects, contributing to research design, data analysis, and reporting, and supervising graduate students in the Quantitative, Qualitative, and Psychometric Methods (QQPM) program.",
+    "Cross-disciplinary appointment integrating research design and methodology, statistics and data science, and public policy. Primary responsibilities include collaborating on funded research projects, contributing to research design, data analysis, and reporting, and supervising graduate students in the Quantitative, Qualitative, and Psychometric Methods (QQPM) program.",
 
   "Postdoctoral Research Associate (contracted affiliation)",
     "Nebraska Statewide Workforce & Educational Reporting System (NSWERS)",

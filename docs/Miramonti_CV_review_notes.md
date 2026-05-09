@@ -61,5 +61,5 @@ The BSc at UCF spans 6 years. Perfectly plausible (part-time, major changes, etc
 | 10 | GRA end date missing | Updated to **2022–August 2024**. |
 | 11 | Heading capitalization inconsistencies | All headings standardized. |
 | 12 | RC position dates | Full-time Research Coordinator added: **September 2024–July 2025**. |
-| 14 | Postdoctoral position | **Postdoctoral Research Fellow**, NEAR Center (primary) + Postdoctoral Research Associate at NSWERS and UNL Public Policy Center; **July 2025–present**. |
+| 14 | Postdoctoral position | **Postdoctoral Researcher**, NEAR Center (primary) + Postdoctoral Research Associate at NSWERS and UNL Public Policy Center; **July 2025–present**. |
 | 15 | Adjunct Faculty Instructor | **EDPS 845 – Computer-Assisted Research Data Analysis**, Dept. of Educational Psychology, UNL, Spring 2026. |
