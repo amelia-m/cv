@@ -84,7 +84,7 @@ Both: `status = "Under review"`, `status_date = "2026-06-08"`.
 1. **Latino Consumer Food Environments: A cross-sectional analysis of rural food retailers**
    - authors: `Santos N, Miramonti AA, Fox G, Abresch C, Franzen-Castle L`
    - journal: `Nutrition & Dietetics`
-   - submitted: `NA_character_` (not stated in email)
+   - submitted: `2026-05-28`
    - notes: `Manuscript ID 4212250; ORCID co-author verification`
 
 2. **The Role of Motivated Cognition in Transphobia: Need for Closure, Gender Essentialism, and Intergroup Contact**
