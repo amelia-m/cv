@@ -351,7 +351,11 @@ manuscripts_data <- tribble(
   "Rasby S, Miramonti AA, Wilhite H"                                                                                                                                             ,
   "“It helps me deal with what's happening right now instead of letting my emotions get out of control.” Exploring a Self-Compassion Group for Family Caregivers"     ,
   "In progress"                                                                                                                                                                  ,
-  NA_character_                                                                                                                                                                  , NA_character_ , "2026-06-08" , "Tentative author list"
+  NA_character_                                                                                                                                                                  , NA_character_ , "2026-06-08" , "Tentative author list" ,
+  "Albert R, Beeghly MJ, Brophy-Herb H, Gardner-Neblett N, Miramonti AA, Torquati J, Vallotton C"                                                                                ,
+  "Racial and Gender Biases in Interpretations of Typical Infant/Toddler Behaviors"                                                                                             ,
+  "In progress"                                                                                                                                                                  ,
+  NA_character_                                                                                                                                                                  , NA_character_ , "2026-06-08" , "Author order undetermined; listed alphabetically"
 )
 
 # ==============================================================
