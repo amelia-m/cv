@@ -27,6 +27,7 @@ params:
   show_credentials:     true    # Professional Credentials
   show_lab_skills:      true    # Technical Skills — Laboratory Assessments
   show_languages:       true    # Technical Skills — Languages
+  show_software_dev:    true    # Software — authored open-source tools
   show_profiles:        true    # Online Profiles
   show_coursework:      false   # Graduate Coursework (supplement; off by default)
   coursework_detail:    "full"  # "summary", "full", or "both"
@@ -295,6 +296,18 @@ awards_data |>
     what  = award,
     when  = dates,
     with  = organization
+  )
+```
+
+`r if (params$show_software_dev) "# Software"`
+
+```{r software-dev, eval=params$show_software_dev}
+software_dev_data |>
+  detailed_entries(
+    what = name,
+    when = when,
+    with = role,
+    why  = description
   )
 ```
 
