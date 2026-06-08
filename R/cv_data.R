@@ -122,6 +122,11 @@ positions_data <- tribble(
 
 lectures_data <- tribble(
   ~title                                                                                                                                                                                     , ~context , ~date ,
+  # TODO: add Session 2 of 2 — "Data Wrangling: Organization, Cleaning, Recoding, etc." (same Brown Bagger series) once delivered.
+  "Data documentation for Teams (Session 1 of 2)"                                                                                                                                            ,
+  "Data Management Brown Bagger Series, University of Nebraska Public Policy Center, Lincoln, NE."                                                                                           ,
+  "June 2026"                                                                                                                                                                                ,
+
   "Interaction Contrasts in ANOVA"                                                                                                                                                           ,
   "Guest lecture, EDPS 941 – Intermediate Statistics: Experimental Methods (Dr. Matt Fritz, instructor), Department of Educational Psychology, University of Nebraska–Lincoln, Lincoln, NE." ,
   "March 26, 2026"                                                                                                                                                                           ,
