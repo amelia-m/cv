@@ -19,6 +19,7 @@ engine: knitr
 params:
   # ── Section toggles (all TRUE = full academic CV) ──
   show_manuscripts:     true    # Manuscripts in Progress (under Refereed Articles)
+  show_manuscript_journals: false  # Append target journal to under-review/R&R statuses
   show_preprints:       true    # Preprints (under Refereed Articles)
   show_presentations:   true    # Papers Presented at Professional Meetings
   show_mentoring:       true    # Mentoring Experience
@@ -179,10 +180,20 @@ bibliography_entries("bib/publications.bib") |>
 `r if (params$show_manuscripts) "## Manuscripts in Progress"`
 
 ```{r manuscripts, eval=params$show_manuscripts}
+# status_label: optionally append the target journal for submitted work.
+# journal/submitted/status_date/notes columns are internal tracking fields
+# consumed by update_bib.R (Section 6) and are never rendered directly.
 manuscripts_data |>
+  mutate(
+    status_label = if_else(
+      params$show_manuscript_journals & !is.na(journal) & status != "In progress",
+      paste0(status, " — ", journal),
+      status
+    )
+  ) |>
   brief_entries(
     what = title,
-    when = status,
+    when = status_label,
     with = authors
   )
 ```
