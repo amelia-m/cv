@@ -335,7 +335,15 @@ manuscripts_data <- tribble(
   "Fukuda DH, Stout JR, Robinson EH, Wang R, Mangine GT, Miramonti AA, Fragala MS, Hoffman JR"                                                                                   ,
   "Improved critical power and muscle cross-sectional area following a progressive 4-week cycling interval training program in men and women"                                    ,
   "In progress"                                                                                                                                                                  ,
-  NA_character_                                                                                                                                                                  , NA_character_ , NA_character_ , NA_character_
+  NA_character_                                                                                                                                                                  , NA_character_ , NA_character_ , NA_character_ ,
+  "Santos N, Miramonti AA, Fox G, Abresch C, Franzen-Castle L"                                                                                                                   ,
+  "Latino Consumer Food Environments: A cross-sectional analysis of rural food retailers"                                                                                        ,
+  "Under review"                                                                                                                                                                 ,
+  "Nutrition & Dietetics"                                                                                                                                                        , "2026-05-28" , "2026-06-08" , "Manuscript ID 4212250; ORCID co-author verification" ,
+  "Vargas J, Miramonti AA, Abbott D"                                                                                                                                             ,
+  "The Role of Motivated Cognition in Transphobia: Need for Closure, Gender Essentialism, and Intergroup Contact"                                                                ,
+  "Under review"                                                                                                                                                                 ,
+  "Sex Roles"                                                                                                                                                                    , "2026-06-02" , "2026-06-08" , "Submission ID 3d1fd576-28b8-435c-9741-007d154a60ab; co-author"
 )
 
 # ==============================================================
