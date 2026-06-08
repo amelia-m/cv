@@ -343,7 +343,15 @@ manuscripts_data <- tribble(
   "Vargas J, Miramonti AA, Abbott D"                                                                                                                                             ,
   "The Role of Motivated Cognition in Transphobia: Need for Closure, Gender Essentialism, and Intergroup Contact"                                                                ,
   "Under review"                                                                                                                                                                 ,
-  "Sex Roles"                                                                                                                                                                    , "2026-06-02" , "2026-06-08" , "Submission ID 3d1fd576-28b8-435c-9741-007d154a60ab; co-author"
+  "Sex Roles"                                                                                                                                                                    , "2026-06-02" , "2026-06-08" , "Submission ID 3d1fd576-28b8-435c-9741-007d154a60ab; co-author" ,
+  "Yang Z, Miramonti AA, Choi JK, Jiang Q, Wang D"                                                                                                                               ,
+  "Validation of the HOME Inventory's Time Invariance in FFCWS: Insights into Home Environment Changes in Disadvantaged Parents Over a Decade"                                   ,
+  "In progress"                                                                                                                                                                  ,
+  NA_character_                                                                                                                                                                  , NA_character_ , "2026-06-08" , NA_character_ ,
+  "Rasby S, Miramonti AA, Wilhite H"                                                                                                                                             ,
+  "“It helps me deal with what's happening right now instead of letting my emotions get out of control.” Exploring a Self-Compassion Group for Family Caregivers"     ,
+  "In progress"                                                                                                                                                                  ,
+  NA_character_                                                                                                                                                                  , NA_character_ , "2026-06-08" , "Tentative author list"
 )
 
 # ==============================================================
