@@ -254,7 +254,9 @@ if (file.exists("R/cv_data.R")) {
       " entries; audited in Section 6, not pooled)"
     )
   }
-  manuscript_statuses <- if (ok && exists("manuscript_statuses", envir = .env)) {
+  manuscript_statuses <- if (
+    ok && exists("manuscript_statuses", envir = .env)
+  ) {
     .env$manuscript_statuses
   } else {
     character(0)
@@ -264,6 +266,11 @@ if (file.exists("R/cv_data.R")) {
 # bib_ignore.R — user-maintained allowlists (year discrepancies + extra titles)
 .ignore_year <- list()
 .ignore_count <- 0L
+# Normalized extra_matched_titles — Scholar/ORCID works that are theses,
+# dissertations, posters, or parsing artifacts (NOT journal articles).
+# Used in Section 6 to suppress false-positive PROMOTION CANDIDATE flags:
+# a manuscript whose Scholar/ORCID match is one of these is not "published."
+.ignore_extra_norms <- character(0)
 if (file.exists("R/bib_ignore.R")) {
   .ig <- new.env()
   ok <- tryCatch(
@@ -290,7 +297,8 @@ if (file.exists("R/bib_ignore.R")) {
         length(.ignore_year),
         " year allowlist entries)"
       )
-      known_titles_norm <- c(known_titles_norm, norm_title(extras))
+      .ignore_extra_norms <- norm_title(extras)
+      known_titles_norm <- c(known_titles_norm, .ignore_extra_norms)
     }
   }
 }
@@ -700,7 +708,11 @@ add(" SECTION 6 — Manuscript pipeline (cv_data.R::manuscripts_data)")
 hr()
 add("")
 
-if (!exists("manuscripts_df") || is.null(manuscripts_df) || nrow(manuscripts_df) == 0) {
+if (
+  !exists("manuscripts_df") ||
+    is.null(manuscripts_df) ||
+    nrow(manuscripts_df) == 0
+) {
   add("  (manuscripts_data not found or empty — skipping)")
   add("")
 } else {
@@ -747,8 +759,14 @@ if (!exists("manuscripts_df") || is.null(manuscripts_df) || nrow(manuscripts_df)
       glue("verified {m$status_date} ({age} days ago)")
     }
 
-    # Promotion check
-    if (sources_ok && title_is_known(m$title_norm, fetched_norms)) {
+    # Promotion check. Suppress when the manuscript's Scholar/ORCID match is
+    # an allowlisted thesis/dissertation/artifact (extra_matched_titles) —
+    # those are not journal publications, so it's a false positive.
+    if (
+      sources_ok &&
+        title_is_known(m$title_norm, fetched_norms) &&
+        !title_is_known(m$title_norm, .ignore_extra_norms)
+    ) {
       flags <- c(
         flags,
         "PROMOTION CANDIDATE — appears on Scholar/ORCID; move to publications.bib and remove this row"
@@ -776,7 +794,9 @@ if (!exists("manuscripts_df") || is.null(manuscripts_df) || nrow(manuscripts_df)
   })
 
   if (n_stale_manuscripts == 0 && n_promotions == 0) {
-    add("  ✓ All manuscripts verified within {.manuscript_stale_days} days; none appear published.")
+    add(
+      "  ✓ All manuscripts verified within {.manuscript_stale_days} days; none appear published."
+    )
     add("")
   }
 }
