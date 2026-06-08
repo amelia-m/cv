@@ -355,7 +355,7 @@ manuscripts_data <- tribble(
   "Albert R, Beeghly MJ, Brophy-Herb H, Gardner-Neblett N, Miramonti AA, Torquati J, Vallotton C"                                                                                ,
   "Racial and Gender Biases in Interpretations of Typical Infant/Toddler Behaviors"                                                                                             ,
   "In progress"                                                                                                                                                                  ,
-  NA_character_                                                                                                                                                                  , NA_character_ , "2026-06-08" , "Author order undetermined; listed alphabetically"
+  NA_character_                                                                                                                                                                  , NA_character_ , "2026-06-08" , "Working title; author order undetermined, listed alphabetically"
 )
 
 # ==============================================================
