@@ -33,3 +33,6 @@ Thumbs.db
 # update_bib.R review output (ephemeral; findings go into bib_review_notes.md)
 bib_review.txt
 bib_review_*.txt
+
+# Stray Quarto HTML render (vitae uses the rmarkdown PDF pipeline)
+cv.html

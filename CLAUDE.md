@@ -11,6 +11,21 @@ Use `rmarkdown::render`, **not** `quarto render` — the `vitae` package uses th
 source("R/render.R")                # full academic CV → output/cv.pdf
 ```
 
+**Pandoc on the PATH** — `rmarkdown::render` needs pandoc. RStudio/Positron
+bundle it and set it up automatically, so an interactive console "just works."
+A bare `Rscript` from a plain shell does **not** see pandoc and fails with
+`pandoc version 1.12.3 or higher is required and was not found`. Fix: set
+`RSTUDIO_PANDOC` to a dir containing `pandoc.exe` before rendering, e.g. the
+RStudio bundle:
+
+```powershell
+$env:RSTUDIO_PANDOC = "C:\Program Files\RStudio\resources\app\bin\quarto\bin\tools"
+& "C:\Program Files\R\R-4.5.2\bin\Rscript.exe" R/render.R
+```
+
+(A Quarto install at `C:\Program Files\Quarto\bin\tools` also has a usable
+`pandoc.exe`.) Render from Positron/RStudio to avoid this entirely.
+
 Named profiles (pass as first arg to `Rscript R/render.R <profile>`):
 
 | Profile | Output |
@@ -34,9 +49,13 @@ source("R/update_bib.R")           # prints report; never modifies .bib files
 # To save: source("R/update_bib.R"); writeLines(report, "bib-reviews/bib_review.txt")
 ```
 
-Fetches Google Scholar + ORCID, cross-references against `bib/publications.bib`, `bib/presentations.bib`, `R/cv_data.R` preprints, and `R/bib_ignore.R` allowlists. Reports: unmatched titles, year discrepancies, missing DOIs, incomplete volume/page data.
+Fetches Google Scholar + ORCID, cross-references against `bib/publications.bib`, `bib/presentations.bib`, `R/cv_data.R` preprints, and `R/bib_ignore.R` allowlists. Reports: unmatched titles, year discrepancies, missing DOIs, incomplete volume/page data, and (Section 6) the manuscript pipeline. A 0-row Scholar fetch is treated as a failed fetch (Google block), not a clean pass.
 
 Add persistent false positives to `R/bib_ignore.R` — year-discrepancy allowlist or `extra_matched_titles`.
+
+## Manuscripts under review (Section 6)
+
+`R/cv_data.R::manuscripts_data` tracks work Scholar/ORCID can't see (in prep, under review, R&R). Columns `journal`, `submitted`, `status_date`, `notes` are internal; `status` (controlled vocabulary in `manuscript_statuses`) renders on the CV; `journal` renders only when the `show_manuscript_journals` param is TRUE (default false). Every `update_bib.R` run flags rows with `status_date` NA or >60 days old as NEEDS STATUS CHECK, and rows whose title now appears on Scholar/ORCID as PROMOTION CANDIDATE → add to `publications.bib`, delete the row. Manuscript titles are deliberately NOT in the known-titles pool. When verifying a status, update `status_date` even if the status didn't change.
 
 ## Architecture
 

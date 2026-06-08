@@ -72,6 +72,14 @@ Rscript R/render.R full --quiet     # suppress LaTeX progress output
 > The `vitae` package uses the R Markdown rendering pipeline;
 > the Quarto CLI does not support `vitae` output formats directly.
 
+> **Pandoc note:** rendering needs pandoc on the PATH. Positron/RStudio set
+> this up automatically, so rendering from an IDE console "just works." A bare
+> `Rscript` from a plain shell fails with *"pandoc version 1.12.3 or higher is
+> required and was not found"* — set `RSTUDIO_PANDOC` to a dir containing
+> `pandoc.exe` first (e.g. RStudio's bundle at
+> `C:\Program Files\RStudio\resources\app\bin\quarto\bin\tools`, or a Quarto
+> install at `C:\Program Files\Quarto\bin\tools`).
+
 ## Checking for new publications (`update_bib.R`)
 
 Run periodically (e.g., before re-submitting a job application) to catch new
@@ -98,6 +106,7 @@ It then prints a report covering:
 | 3 | ORCID works not matched against any known source |
 | 4 | DOI enrichment — ORCID has a DOI that the bib entry is missing |
 | 5 | Bib entries missing volume / pages (and not flagged as online-first) |
+| 6 | Manuscript pipeline — staleness of `manuscripts_data` statuses and promotion candidates (see below) |
 
 **The script never modifies `publications.bib`** — all updates are manual.
 To also save the report to a file:
@@ -105,6 +114,34 @@ To also save the report to a file:
 ```r
 source("R/update_bib.R"); writeLines(report, "bib-reviews/bib_review.txt")
 ```
+
+### Tracking manuscripts under review (Section 6)
+
+Manuscripts that Scholar/ORCID can't see yet (in prep, under review, R&R)
+live in `R/cv_data.R::manuscripts_data` with internal tracking columns:
+
+| Column | Purpose |
+|--------|---------|
+| `status` | Controlled vocabulary (`manuscript_statuses`): In progress, Under review, Revise & Resubmit, Accepted. Rendered on the CV. |
+| `journal` | Target journal — internal unless the `show_manuscript_journals` param is `TRUE` |
+| `submitted` | `"YYYY-MM-DD"` submitted to the current journal (internal) |
+| `status_date` | `"YYYY-MM-DD"` the status was last **verified** (internal) |
+| `notes` | Free-text internal notes (never rendered) |
+
+Every `update_bib.R` run audits this table:
+
+- **Staleness** — any row whose `status_date` is `NA` or older than **60 days**
+  is flagged `NEEDS STATUS CHECK`. After verifying a status (journal portal,
+  email, co-author), update `status_date` even if the status didn't change.
+- **Promotion** — manuscript titles are fuzzy-matched against the works
+  fetched from Scholar/ORCID. A match means the paper is now public:
+  add it to `bib/publications.bib` (with `note = {Published online ...}` if
+  volume/pages aren't out yet — Section 5 then tracks completion) and
+  **delete the row** from `manuscripts_data`.
+
+Manuscript titles are deliberately *not* added to the known-titles pool, so
+a newly published manuscript also appears in Section 1/3 as unmatched —
+Section 6 tells you why.
 
 ### Suppressing known false positives (`R/bib_ignore.R`)
 
