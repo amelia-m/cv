@@ -50,6 +50,11 @@ header-includes:
   - \renewcommand{\section}[1]{\needspace{8\baselineskip}\oldsection{#1}}
   - \let\oldsubsection\subsection
   - \renewcommand{\subsection}[1]{\needspace{6\baselineskip}\oldsubsection{#1}}
+  # Render a literal Greek β (U+03B2) in body text (MSc thesis title).
+  # pdflatex + T1 text fonts can't show β directly, so map the code point
+  # to math-mode \beta. Keeps education_data as plain text (protection on).
+  - \usepackage{newunicodechar}
+  - \newunicodechar{β}{\ensuremath{\beta}}
 ---
 
 ```{r setup, include=FALSE}

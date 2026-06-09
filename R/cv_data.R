@@ -14,22 +14,36 @@ conflicts_prefer(dplyr::filter, dplyr::select, .quiet = TRUE)
 # ==============================================================
 
 education_data <- tribble(
-  ~degree                                                                                                                                                                                                                                                                                    , ~institution  , ~location   , ~dates , ~details ,
-  "PhD — Interdisciplinary"                                                                                                                                                                                                                                                                  ,
-  "University of Nebraska–Lincoln"                                                                                                                                                                                                                                                           , "Lincoln, NE" , "2015–2025" ,
-  "Quantitative, Qualitative, & Psychometric Methods (Educational Psychology); Human Sciences: Exercise Physiology & Nutrition (Nutrition & Health Sciences). Dissertation: Youth Sport Participation and Cognitive Development: The Need for Improved Measurement. Conferred May 17, 2025." ,
+  ~degree                                                    , ~institution                    , ~location     , ~dates      ,
+  "PhD — Interdisciplinary"                                  , "University of Nebraska–Lincoln" , "Lincoln, NE" , "2015–2025" ,
+  "MA — Quantitative, Qualitative, and Psychometric Methods" , "University of Nebraska–Lincoln" , "Lincoln, NE" , "2018"      ,
+  "MSc — Sport & Exercise Science"                           , "University of Central Florida"  , "Orlando, FL" , "2013–2015" ,
+  "BSc — Sport and Exercise Science"                         , "University of Central Florida"  , "Orlando, FL" , "2007–2013"
+)
 
-  "MA — Quantitative, Qualitative, and Psychometric Methods"                                                                                                                                                                                                                                 ,
-  "University of Nebraska–Lincoln"                                                                                                                                                                                                                                                           , "Lincoln, NE" , "2018"      ,
-  "Educational Psychology. Thesis: Evaluation of the Feasibility of a Two-Method Measurement Design for the Assessment of Healthy Physical Activity Behavior in Youth."                                                                                                                      ,
-
-  "MSc — Sport & Exercise Science"                                                                                                                                                                                                                                                           ,
-  "University of Central Florida"                                                                                                                                                                                                                                                            , "Orlando, FL" , "2013–2015" ,
-  "Applied Exercise Physiology Track. Thesis: The Effects of Four Weeks of High-Intensity Interval Training and \\(\\beta\\)-Hydroxy-\\(\\beta\\)-Methylbutyric Free Acid Supplementation on the Onset of Neuromuscular Fatigue."                                                            ,
-
-  "BSc — Sport and Exercise Science"                                                                                                                                                                                                                                                         ,
-  "University of Central Florida"                                                                                                                                                                                                                                                            , "Orlando, FL" , "2007–2013" ,
-  "Human Performance Specialization."
+# `details` is a list-column: each degree's bullets render as separate
+# itemize lines via detailed_entries(why = details) in cv.qmd (default
+# .protect = TRUE, so write plain text — ampersands are escaped for you).
+# The Greek β below is a literal U+03B2; cv.qmd's header-includes map it
+# to math-mode \beta via newunicodechar so it renders correctly.
+education_data$details <- list(
+  c(
+    "Majors: Quantitative, Qualitative, & Psychometric Methods (Educational Psychology)",
+    "Human Sciences: Exercise Physiology & Nutrition (Nutrition & Health Sciences)",
+    "Dissertation: Youth Sport Participation and Cognitive Development: The Need for Improved Measurement",
+    "Conferred May 17, 2025"
+  ),
+  c(
+    "Educational Psychology",
+    "Thesis: Evaluation of the Feasibility of a Two-Method Measurement Design for the Assessment of Healthy Physical Activity Behavior in Youth"
+  ),
+  c(
+    "Applied Exercise Physiology Track",
+    "Thesis: The Effects of Four Weeks of High-Intensity Interval Training and β-Hydroxy-β-Methylbutyric Free Acid Supplementation on the Onset of Neuromuscular Fatigue"
+  ),
+  c(
+    "Human Performance Specialization"
+  )
 )
 
 # ==============================================================
