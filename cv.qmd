@@ -187,12 +187,19 @@ bibliography_entries("bib/publications.bib") |>
 # consumed by update_bib.R (Section 6) and are never rendered directly.
 manuscripts_data |>
   mutate(
+    # Display order: submitted work first (Under review, then R&R, then
+    # Accepted), in-progress drafts last. Stable within each status.
+    .status_rank = match(
+      status,
+      c("Under review", "Revise & Resubmit", "Accepted", "In progress")
+    ),
     status_label = if_else(
       params$show_manuscript_journals & !is.na(journal) & status != "In progress",
       paste0(status, " — ", journal),
       status
     )
   ) |>
+  arrange(.status_rank) |>
   brief_entries(
     what = title,
     when = status_label,
