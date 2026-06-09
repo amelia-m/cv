@@ -189,6 +189,12 @@ installed template file:
   \HUGE \textsc{$name$$if(surname)$ $surname$$endif$}\\[4pt]
   \small \textsc{$if(docname)$$docname$$else$Resume$endif$}$if(position)$ \textcolor{sectcol}{\rule[-1mm]{0.8mm}{0.32cm}} $position$$endif$
   ```
+- Line ~396 (address metasection): wrapped in a left `\shortstack` so multiple
+  affiliations stack on separate lines, driven by optional `affiliation2` /
+  `affiliation3` YAML vars in `cv.qmd` (in addition to `address`):
+  ```latex
+  ...{$if(address)$\faIcon{map-marker-alt} \shortstack[l]{$address$$if(affiliation2)$\\$affiliation2$$endif$$if(affiliation3)$\\$affiliation3$$endif$}$endif$}
+  ```
 
 (Note: the actual install path uses the current Windows user — e.g.
 `C:\Users\amiramonti2\AppData\Local\R\win-library\4.5\vitae\...` — not the
