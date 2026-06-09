@@ -256,7 +256,7 @@ software_dev_data <- tribble(
   "Recode Studio"                , "Ongoing"  , "Author & maintainer — R / Shiny"  ,
   "Dataset-agnostic R/Shiny app for cleaning messy string variables without hand-writing R: browse values, flag likely typos via spellcheck, build and preview recode rules, and export both a reusable rule set and runnable R code. Open source: github.com/amelia-m/recode-studio" ,
   "Table Relationship Explorer"  , "Ongoing"  , "Author & maintainer — R / Shiny"  ,
-  "Interactive tool for discovering and visualizing primary/foreign-key relationships across tabular data: multi-signal key inference with confidence scoring, interactive entity-relationship diagrams, and exportable reports across many file and database formats (with a Python/Streamlit port). Open source: github.com/amelia-m/table_explorer"
+  "Interactive tool for discovering and visualizing primary/foreign-key relationships across tabular data: multi-signal key inference with confidence scoring, interactive entity-relationship diagrams, and exportable reports across many file and database formats (with a Python/Streamlit port). Open source: github.com/amelia-m/table-explorer"
 )
 
 software_data <- tribble(
