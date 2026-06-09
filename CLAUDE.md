@@ -83,7 +83,7 @@ Section visibility is controlled entirely by `params` in `cv.qmd` YAML — `show
 
 ## Key quirks
 
-- **vitae LaTeX patch** — the installed `vitae` latexcv template (`classic/main.tex`) has been manually patched for FontAwesome 5 and a negative bottom-margin fix. This patch lives at `C:\Users\ameli\AppData\Local\R\win-library\4.5\vitae\rmarkdown\templates\latexcv\resources\classic\main.tex` and **will be overwritten if `vitae` is reinstalled or updated**. Re-apply if ORCID/Scholar/ResearchGate footer icons disappear. See README for exact line numbers.
+- **vitae LaTeX patch** — the installed `vitae` latexcv template (`classic/main.tex`) has been manually patched for FontAwesome 5, a negative bottom-margin fix, and a two-line header (name on line 1; `docname` + `position` on line 2). This patch lives at `C:\Users\<user>\AppData\Local\R\win-library\4.5\vitae\rmarkdown\templates\latexcv\resources\classic\main.tex` (current machine: `amiramonti2`) and **will be overwritten if `vitae` is reinstalled or updated**. Re-apply if ORCID/Scholar/ResearchGate footer icons disappear, page text clips at the bottom, or the header reverts to one line / says "Resume". See README for exact line numbers. (The header text itself — "Curriculum Vitae" — comes from `docname` in `cv.qmd` YAML, not the template.)
 
 - **Running headers suppressed** — `cv.qmd` injects `\fancyhf{}` + `\renewcommand{\headrulewidth}{0pt}` to suppress the default `\rightmark` running header that the latexcv template enables without explicitly clearing.
 

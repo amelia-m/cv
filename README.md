@@ -181,10 +181,23 @@ installed template file:
 - Lines 395–397: all `\faicon{...}` → `\faIcon{...}` (also updated `map-marker` → `map-marker-alt`)
 - Lines 441–446: remaining `\faicon{...}` → `\faIcon{...}`
 - Line 86: `bottom=-.6cm` → `bottom=2cm` (negative margin caused text to overflow and get clipped at page bottoms)
+- Lines 384–385: header restructured to **two lines** — name alone on line 1
+  (`\HUGE`), then `docname` + `position` on line 2 (`\small`), with the `sectcol`
+  rule as the separator. Replaces the original single-line `name | docname` layout,
+  which wrapped awkwardly once `docname` was set to "Curriculum Vitae". New form:
+  ```latex
+  \HUGE \textsc{$name$$if(surname)$ $surname$$endif$}\\[4pt]
+  \small \textsc{$if(docname)$$docname$$else$Resume$endif$}$if(position)$ \textcolor{sectcol}{\rule[-1mm]{0.8mm}{0.32cm}} $position$$endif$
+  ```
+
+(Note: the actual install path uses the current Windows user — e.g.
+`C:\Users\amiramonti2\AppData\Local\R\win-library\4.5\vitae\...` — not the
+`ameli` path shown above.)
 
 > ⚠️ **This patch will be overwritten if `vitae` is reinstalled or updated.**
 > Re-apply the changes above if ORCID/Scholar/ResearchGate icons disappear from
-> the footer after a package update.
+> the footer, page text clips at the bottom, or the header reverts to a single
+> line / says "Resume" after a package update.
 >
 > A PR to fix this upstream in the vitae package is planned.
 
