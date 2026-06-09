@@ -1,6 +1,7 @@
 ---
 name: Amelia A.
 surname: Miramonti
+docname: "Curriculum Vitae"
 position: "Postdoctoral Researcher and Adjunct Faculty"
 address: "Nebraska Evaluation and Research Center · University of Nebraska–Lincoln"
 email: "amiramonti@nebraska.edu"
